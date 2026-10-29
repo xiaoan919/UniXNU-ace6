@@ -26,9 +26,11 @@ archives = [
   "component:PaganiArmCpu",
   "component:NativeAES",
   "component:NativeUfs",
+  "build-ufs-storage-bindings.py --kernelcache ../../../../ipsw/21H461/kernelcache.decompressed",
   "component:NativeVirtioBlock",
   "component:NativeRamBlock",
   "component:ShengPlatformPower",
+  "build-pagani-verified-root-probe.py --component os --include-systemos",
   "component:NativeMobileDisplay"
 ]
 
