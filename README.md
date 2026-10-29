@@ -56,12 +56,12 @@ board.toml                    device configuration
 feeds.toml                    pins UniXNU-sm8750-common b79d675
 configs/ace6_defconfig        kernel configuration
 dts/ace6.dts                  board root, CPU, GPU, memory windows
-dts/ace6-touch.dtsi           S3910 wiring
-dts/ace6-panel.dtsi           AA605 timings and DSC
+dts/pagani-touch.dtsi           S3910 wiring
+dts/pagani-panel.dtsi           AA605 timings and DSC
 dts/sm8750.dtsi               from the SoC feed
-package/Ace6Peripherals.h     every board constant, value + source
+package/PaganiPeripherals.h     every board constant, value + source
 drivers/                      ported from UniXNU-Pagani-Drivers
-kits/                         NativePrelink, Ace6VerifiedRoot
+kits/                         NativePrelink, PaganiVerifiedRoot
 docs/hardware.md              measured hardware
 docs/diff-vs-13t.md           node-by-node comparison with the 13T
 docs/driver-reuse.md          what could be reused and why

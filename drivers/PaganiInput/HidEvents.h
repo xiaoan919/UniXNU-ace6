@@ -10,10 +10,10 @@
 #include <libkern/c++/OSUnserialize.h>
 
 // Event fields and edge marking follow ShengHidInput 5f3a37c; the builder qualifies this OS ABI.
-namespace ace6_hid {
+namespace pagani_hid {
 enum : uint32_t { digitizer=11,xField=0xb0000,yField=0xb0001,indexField=0xb0005,
                  maskField=0xb0007,touchField=0xb0009,touchChanged=2,fromEdgeTip=0x800 };
-static uintptr_t dispatchTable[ACE6_HID_DRIVER_SLOTS+2];
+static uintptr_t dispatchTable[PAGANI_HID_DRIVER_SLOTS+2];
 static bool fromEdge[256];
 static uint32_t edgeX,edgeY,events,digitizers,edges,lastMask;
 static uint64_t lastXY;
@@ -77,7 +77,7 @@ static bool mark(OSObject *event,bool &sampled) {
     if (down && !sampled) {
         __atomic_store_n(&lastXY,(uint64_t)(uint32_t)x<<32|(uint32_t)y,__ATOMIC_RELAXED);sampled=true;
     }
-    bool edge=ace6_touch_edge(fromEdge,id,(mask&touchChanged)!=0,down,x,y,edgeX,edgeY);
+    bool edge=pagani_touch_edge(fromEdge,id,(mask&touchChanged)!=0,down,x,y,edgeX,edgeY);
     if (edge) {
         call<void,uint32_t,int32_t,IOOptionBits>(event,24,maskField,(int32_t)(mask|fromEdgeTip),0);
         if (down && (mask&touchChanged)) __atomic_add_fetch(&edges,1,__ATOMIC_RELAXED);

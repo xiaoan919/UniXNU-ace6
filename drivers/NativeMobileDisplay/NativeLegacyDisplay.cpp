@@ -45,7 +45,7 @@ extern "C" void native_legacy_gpu_fallback_observed(int status);
 extern "C" void native_legacy_vsync_notify(void *display,uint64_t timestamp,uint64_t continuousTime,uint64_t interval);
 // The unchanged original setDisplayRefreshProperties: publishes IOMFBDisplayRefresh from slot 301 (getRefreshAttributes below).
 extern "C" bool native_legacy_set_refresh_properties(void *display);
-extern "C" void ace6_panel_set_power(unsigned);
+extern "C" void pagani_panel_set_power(unsigned);
 extern "C" void native_legacy_vsync_observed(unsigned event,unsigned hz);
 extern "C" uint64_t mach_continuous_time(void);
 // 32-bit BGRA, plain ('BGRA') or in Apple's lossless-compressed spelling ('&BGA', one plane): the GPU that renders the surface here writes plain rows
@@ -189,7 +189,7 @@ public:
         native_legacy_pm_observed(3,kIOReturnSuccess,ordinal);
         IOReturn status=IOMobileFramebufferLegacy::setPowerState(ordinal,device);
         if(status==kIOReturnSuccess) {
-            ace6_panel_set_power((unsigned)ordinal);
+            pagani_panel_set_power((unsigned)ordinal);
             if(IOWorkLoop *loop=getWorkLoop())loop->runAction([](OSObject *owner,void *value,void *,void *,void *)->IOReturn {
                 auto self=static_cast<NativeLegacyDisplay *>(owner);
                 self->displayOn=(uintptr_t)value!=0;

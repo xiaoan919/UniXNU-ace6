@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
-#ifndef ACE6_S3910_H
-#define ACE6_S3910_H
+#ifndef PAGANI_S3910_H
+#define PAGANI_S3910_H
 #include <stddef.h>
 #include <stdint.h>
 #ifdef __cplusplus

@@ -8,7 +8,7 @@
 **触控可以几乎零成本移植，面板可以低成本移植，其余全部原样可用。**
 
 原因在架构：所有板级数值集中在 `package/PaganiPeripherals.h` 一个 44 行头文件里，
-驱动本体只消费宏。把该头文件换成 `Ace6Peripherals.h` 即可。
+驱动本体只消费宏。把该头文件换成 `PaganiPeripherals.h` 即可。
 
 | 驱动 | 体积 | 可复用度 | 说明 |
 | --- | --- | --- | --- |
@@ -107,7 +107,7 @@ Ace6 runtime DT: spi@a90000 有 iommus 属性吗？ False
 SM8750 的 GENI SPI 走的是非 SMMU 旁路路径（或由 GENI wrapper 统一代理），
 DT 层不声明 per-SE 的 iommus。13T 的 `0xa3` 是它自己实测出来的旁路 SID。
 
-**处置**：`Ace6Peripherals.h` 里保留 `ACE6_TOUCH_SMMU_SID_UNKNOWN 1` 而非编造数值，
+**处置**：`PaganiPeripherals.h` 里保留 `PAGANI_TOUCH_SMMU_SID_UNKNOWN 1` 而非编造数值，
 并在驱动里加运行期探测。实测方法见 `docs/touch-bringup.md`。
 
 ### 3.2 电源轨：结构不同
@@ -141,7 +141,7 @@ L4B: regulator-pm-humu-l4 {
 **固定电压、无 VRM 地址**，说明它由 PMIC 默认状态供电，不需要 RPMh 命令。
 3.1 V 那条轨在本机活动节点里不存在（SM8750 的 S3910 只需要 1.8 V VDDI）。
 
-**处置**：`Ace6Peripherals.h` 定义 `ACE6_TOUCH_NO_VCC 1`；驱动里跳过 VRM 使能，
+**处置**：`PaganiPeripherals.h` 定义 `PAGANI_TOUCH_NO_VCC 1`；驱动里跳过 VRM 使能，
 改为仅确认 `L4B` 已上电（读 PMIC 状态）后直接进入 GPIO 复位序列。
 
 ### 3.3 tlmm 引脚：号同、强度不同
@@ -158,7 +158,7 @@ L4B: regulator-pm-humu-l4 {
 | ATTN (162) | 3 | 3 |
 
 来源：`qupv3_se4_spi_{miso,mosi,clk,cs}_active` 的 `drive-strength` 属性。
-已写入 `ACE6_TOUCH_DRIVES {6, 4, 6, 4, 3, 3}`。
+已写入 `PAGANI_TOUCH_DRIVES {6, 4, 6, 4, 3, 3}`。
 
 ## 四、完全可直接用的（零改动）
 
@@ -176,11 +176,11 @@ L4B: regulator-pm-humu-l4 {
 
 1. 复制 `drivers/` 全部到 `UniXNU-ace6/drivers/`
 2. 复制 `kits/` 全部
-3. `package/PaganiPeripherals.h` → 替换为 `package/Ace6Peripherals.h`（已生成）
-4. 全局替换源码里的 `PAGANI_` 前缀为 `ACE6_`，以及 `Pagani` 类名 → `Ace6`
+3. `package/PaganiPeripherals.h` → 替换为 `package/PaganiPeripherals.h`（已生成）
+4. 全局替换源码里的 `PAGANI_` 前缀为 `PAGANI_`，以及 `Pagani` 类名 → `Ace6`
 5. `PaganiInput.cpp` 的 `startTouchPower()` 改为跳过 VRM，只校验 L4B
 6. `PaganiInput.cpp` 的 SMMU 段改为运行期探测 SID
-7. `Ace6Panel` 用 `PaganiPanel.cpp` 为模板，改三个亮度常量
+7. `PaganiPanel` 用 `PaganiPanel.cpp` 为模板，改三个亮度常量
 
 ## 六、未验证项
 

@@ -97,7 +97,7 @@ qupv3_se4_spi_sleep        pins=gpio48  func=gpio         drive=0x04  bias-pull-
 //   rpmh_vrm_address(&db, ..., PAGANI_TOUCH_VDD, &addresses[0]);
 //   sm8750_rpmh_vrm_enable(&power, addresses[0], 1800, &result);
 // Ace6：
-//   ACE6_TOUCH_NO_VCC 已定义，跳过第二轨
+//   PAGANI_TOUCH_NO_VCC 已定义，跳过第二轨
 //   第一轨改为读 PMIC 状态确认，不下发 enable 命令
 ```
 

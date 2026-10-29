@@ -19,9 +19,9 @@ extern "C" void boot_progress_display_status(const char *,uint64_t);
 extern "C" void native_legacy_display_static_init(void) __asm__("__GLOBAL__sub_I_NativeLegacyDisplay.cpp");
 extern "C" void native_keyevents_static_init(void) __asm__("__GLOBAL__sub_I_NativeKeyStoreEvents.cpp");
 extern "C" IOService *native_legacy_display_allocate(void),*native_keyevents_allocate(void);
-extern "C" void ace6_input_static_init(void) __asm__("__GLOBAL__sub_I_Ace6Input.cpp");
-extern "C" void ace6_panel_static_init(void) __asm__("__GLOBAL__sub_I_Ace6Panel.cpp");
-extern "C" IOService *ace6_input_allocate(bool),*ace6_panel_allocate(void);
+extern "C" void pagani_input_static_init(void) __asm__("__GLOBAL__sub_I_Ace6Input.cpp");
+extern "C" void pagani_panel_static_init(void) __asm__("__GLOBAL__sub_I_Ace6Panel.cpp");
+extern "C" IOService *pagani_input_allocate(bool),*pagani_panel_allocate(void);
 static IOService *pendingDisplay;
 static bool displayInitialized,ephemeralState;
 static uint64_t frames,clients,aksCalls,aksOpens;
@@ -45,27 +45,27 @@ static void startPeripheral(IOService *service,const char *label,unsigned device
     // A started peripheral retains its service lifetime until reboot, like the display provider.
 }
 static void startPeripherals(bool hidReady) {
-    boot_progress_peripheral_enable(enabled("ace6-peripheral-status"));
-    boot_progress_platform_enable(enabled("ace6-platform-status"));
-    for (unsigned i=0;i<ACE6_SPI;++i) boot_progress_peripheral(i,"disabled",0,0,0);
-    if (enabled("ace6-touch") || enabled("ace6-buttons")) {
-        bool ready=hidReady && registerClass(ace6_input_static_init);
+    boot_progress_peripheral_enable(enabled("pagani-peripheral-status"));
+    boot_progress_platform_enable(enabled("pagani-platform-status"));
+    for (unsigned i=0;i<PAGANI_SPI;++i) boot_progress_peripheral(i,"disabled",0,0,0);
+    if (enabled("pagani-touch") || enabled("pagani-buttons")) {
+        bool ready=hidReady && registerClass(pagani_input_static_init);
         const char *stage=hidReady?"HID class":"HID resource";
-        if (enabled("ace6-buttons")) {
-            boot_progress_peripheral(ACE6_KEYS,stage,ready?0:kIOReturnNotReady,0,0);
-            if (ready) startPeripheral(ace6_input_allocate(false),"physical buttons started",ACE6_KEYS);
+        if (enabled("pagani-buttons")) {
+            boot_progress_peripheral(PAGANI_KEYS,stage,ready?0:kIOReturnNotReady,0,0);
+            if (ready) startPeripheral(pagani_input_allocate(false),"physical buttons started",PAGANI_KEYS);
         }
-        if (enabled("ace6-touch")) {
-            boot_progress_peripheral(ACE6_TOUCH,stage,ready?0:kIOReturnNotReady,0,0);
-            if (ready) startPeripheral(ace6_input_allocate(true),"S3910 touch started",ACE6_TOUCH);
+        if (enabled("pagani-touch")) {
+            boot_progress_peripheral(PAGANI_TOUCH,stage,ready?0:kIOReturnNotReady,0,0);
+            if (ready) startPeripheral(pagani_input_allocate(true),"S3910 touch started",PAGANI_TOUCH);
         }
     }
-    if (enabled("ace6-panel")) {
+    if (enabled("pagani-panel")) {
         kern_return_t loaded=OSKextLoadKextWithIdentifier("com.apple.driver.AppleARMPlatform");
         progress("AppleARMPlatform load",(uint32_t)loaded);
-        bool ready=!loaded && registerClass(ace6_panel_static_init);
-        boot_progress_peripheral(ACE6_PANEL,loaded?"platform load":"panel class",loaded?loaded:(ready?0:kIOReturnNotReady),0,0);
-        if (ready) startPeripheral(ace6_panel_allocate(),"DSI panel control started",ACE6_PANEL);
+        bool ready=!loaded && registerClass(pagani_panel_static_init);
+        boot_progress_peripheral(PAGANI_PANEL,loaded?"platform load":"panel class",loaded?loaded:(ready?0:kIOReturnNotReady),0,0);
+        if (ready) startPeripheral(pagani_panel_allocate(),"DSI panel control started",PAGANI_PANEL);
     }
 }
 static bool console(PE_Video &video) {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "OriginalBacklightABI.h"
-#include "../Ace6Input/Mapping.h"
-#include <Ace6Peripherals.h>
+#include "../PaganiInput/Mapping.h"
+#include <PaganiPeripherals.h>
 #include <IOKit/IOWorkLoop.h>
 #include <IOKit/IOTimerEventSource.h>
 #include <libkern/c++/OSNumber.h>
@@ -9,24 +9,24 @@
 
 // The display PM callback publishes a value, never a pointer into a detachable service.
 static unsigned requestedPower=1;
-extern "C" void ace6_panel_set_power(unsigned on) {__atomic_store_n(&requestedPower,on?1:0,__ATOMIC_RELEASE);}
+extern "C" void pagani_panel_set_power(unsigned on) {__atomic_store_n(&requestedPower,on?1:0,__ATOMIC_RELEASE);}
 
-class Ace6Panel : public AppleARMBacklight {
-    OSDeclareDefaultStructors(Ace6Panel)
+class PaganiPanel : public AppleARMBacklight {
+    OSDeclareDefaultStructors(PaganiPanel)
     PeripheralWindow dsi;
     IOWorkLoop *loop=nullptr;
     IOTimerEventSource *timer=nullptr;
     bool added=false,running=false,failed=false;
-    unsigned appliedPower=1,level=ACE6_BRIGHTNESS_DEFAULT;
-    uint32_t requestedLevel=ACE6_BRIGHTNESS_DEFAULT;
+    unsigned appliedPower=1,level=PAGANI_BRIGHTNESS_DEFAULT;
+    uint32_t requestedLevel=PAGANI_BRIGHTNESS_DEFAULT;
     bool first=true;
     uint64_t commands=0;
     void observe(const char *stage,int rc,uint32_t value) {
-        boot_progress_peripheral(ACE6_PANEL,stage,rc,value,__atomic_load_n(&commands,__ATOMIC_RELAXED));
+        boot_progress_peripheral(PAGANI_PANEL,stage,rc,value,__atomic_load_n(&commands,__ATOMIC_RELAXED));
     }
     void publish() {
         auto b=OSDictionary::withCapacity(3),p=OSDictionary::withCapacity(1);
-        auto lo=OSNumber::withNumber(0ULL,32),hi=OSNumber::withNumber(ACE6_BRIGHTNESS_MAX,32),v=OSNumber::withNumber(level,32);
+        auto lo=OSNumber::withNumber(0ULL,32),hi=OSNumber::withNumber(PAGANI_BRIGHTNESS_MAX,32),v=OSNumber::withNumber(level,32);
         if (b && p && lo && hi && v) {
             b->setObject("min",lo);b->setObject("max",hi);b->setObject("value",v);
             p->setObject("brightness",b);setProperty("IODisplayParameters",p);
@@ -35,7 +35,7 @@ class Ace6Panel : public AppleARMBacklight {
         setProperty("brightness",level,32);setProperty("PanelDisplayOn",appliedPower!=0);
     }
     static void tick(OSObject *owner,IOTimerEventSource *) {
-        auto self=static_cast<Ace6Panel *>(owner);
+        auto self=static_cast<PaganiPanel *>(owner);
         if (!__atomic_load_n(&self->running,__ATOMIC_ACQUIRE) || __atomic_load_n(&self->failed,__ATOMIC_ACQUIRE)) return;
         const unsigned power=__atomic_load_n(&requestedPower,__ATOMIC_ACQUIRE);
         const unsigned goal=__atomic_load_n(&self->requestedLevel,__ATOMIC_ACQUIRE);
@@ -69,7 +69,7 @@ public:
     bool start(IOService *provider) override {
         observe("service start",0,0);
         if (!IOService::start(provider)) {observe("service start",kIOReturnError,0);return false;}
-        if (!dsi.map(ACE6_DSI_BASE,0x1000)) {
+        if (!dsi.map(PAGANI_DSI_BASE,0x1000)) {
             observe("DSI map",kIOReturnNoMemory,0);cleanup();IOService::stop(provider);return false;
         }
         uint32_t control=PeripheralWindow::read(&dsi,4);
@@ -84,7 +84,7 @@ public:
         if (__atomic_load_n(&failed,__ATOMIC_ACQUIRE)) {cleanup();IOService::stop(provider);return false;}
         // Publish only with real AppleARMBacklight ancestry: CoreBrightness uses IOObjectConformsTo.
         setProperty("backlight-control",true);setProperty("Built-In",true);
-        setProperty("PanelMaxBrightness",ACE6_BRIGHTNESS_MAX,32);
+        setProperty("PanelMaxBrightness",PAGANI_BRIGHTNESS_MAX,32);
         setProperty("PanelRefreshSource","firmware timing; software presentation at 60 Hz");
         registerService();return true;
     }
@@ -94,7 +94,7 @@ public:
         auto raw=dict->getObject("brightness");
         if (!raw) return kIOReturnSuccess;
         auto value=OSDynamicCast(OSNumber,raw);
-        if (!value || value->unsigned64BitValue()>ACE6_BRIGHTNESS_MAX) return kIOReturnBadArgument;
+        if (!value || value->unsigned64BitValue()>PAGANI_BRIGHTNESS_MAX) return kIOReturnBadArgument;
         if (!__atomic_load_n(&running,__ATOMIC_ACQUIRE) || __atomic_load_n(&failed,__ATOMIC_ACQUIRE)) return kIOReturnNotReady;
         // shortcut: apply the target without FadePeriod interpolation; add fades after transport qualification.
         __atomic_store_n(&requestedLevel,value->unsigned32BitValue(),__ATOMIC_RELEASE);
@@ -104,8 +104,8 @@ public:
     void stop(IOService *provider) override {cleanup();IOService::stop(provider);}
     void free() override {cleanup();IOService::free();}
     void unqualifiedBacklightMethod() override {
-        panic("Ace6Panel: unsupported AppleARMBacklight slot 168");
+        panic("PaganiPanel: unsupported AppleARMBacklight slot 168");
     }
 };
-OSDefineMetaClassAndStructors(Ace6Panel,AppleARMBacklight)
-extern "C" IOService *ace6_panel_allocate(void) {return new Ace6Panel;}
+OSDefineMetaClassAndStructors(PaganiPanel,AppleARMBacklight)
+extern "C" IOService *pagani_panel_allocate(void) {return new PaganiPanel;}

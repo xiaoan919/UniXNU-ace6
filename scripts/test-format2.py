@@ -92,7 +92,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert actual['/device-tree/psci']['method'] == b'smc\0'
     assert 'cpus=8' in ctx.board['payload']['kernel_args']
     assert 'sheng-smp=1' in ctx.board['payload']['kernel_args']
-    assert 'ace6-peripheral-status=1' not in ctx.board['payload']['kernel_args']
+    assert 'pagani-peripheral-status=1' not in ctx.board['payload']['kernel_args']
     chosen = actual['/device-tree/chosen']
     assert len(chosen['random-seed']) == 64
     assert struct.unpack('<Q', chosen['dram-base']) == (0x980000000,)

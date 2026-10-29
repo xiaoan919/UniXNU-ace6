@@ -11,7 +11,7 @@
 #include <GeniSpi.h>
 #include <PeripheralIO.h>
 #include <Rpmh.h>
-#include <Ace6Peripherals.h>
+#include <PaganiPeripherals.h>
 #include "../../BootProgress/PeripheralStatus.h"
 
 static unsigned spiReads,spiWrites,spiSnapshots,dmaSnapshots,readSnapshots,statusReads,timingReads;
@@ -58,51 +58,51 @@ static int touchTransfer(geni_spi *spi,const uint8_t *tx,uint8_t *rx,size_t size
     spi->last_rx_in=spi->use_dma && rx?(uint32_t)size:0;
     return spiResult;
 }
-struct Ace6Input {
+struct PaganiInput {
     geni_spi spi={};
     bool dmaExposed=false,firstReadCaptured=false;
     PeripheralWindow pins[6];
-    Ace6Input() {spi.se.rd=spiStatus;pins[4].values[0]=pins[4].values[1]=3;}
+    PaganiInput() {spi.se.rd=spiStatus;pins[4].values[0]=pins[4].values[1]=3;}
 #define geni_spi_transfer touchTransfer
 #include "Ace6ReadTouch.inc"
 #undef geni_spi_transfer
 };
 static void spiRead() {
-    Ace6Input device;uint8_t bytes[S3910_PAYLOAD_MAX+8]={};
+    PaganiInput device;uint8_t bytes[S3910_PAYLOAD_MAX+8]={};
     device.spi.info.fw_revision=0x101;device.spi.info.if_disable=1;
-    assert(!Ace6Input::readTouch(&device,bytes,4) && bytes[0]==0xa5 && spiReads==1);
+    assert(!PaganiInput::readTouch(&device,bytes,4) && bytes[0]==0xa5 && spiReads==1);
     const uint32_t expectedRead[]={4,0xa5a5a5a5,13,0,0x40,0,0,0xc800};
     assert(readSnapshots==1 && statusReads==1 && timingReads==1 && !memcmp(readSnapshot,expectedRead,sizeof expectedRead));
-    assert(!Ace6Input::readTouch(&device,bytes,sizeof(bytes)-1) && spiReads==2);
+    assert(!PaganiInput::readTouch(&device,bytes,sizeof(bytes)-1) && spiReads==2);
     assert(readSnapshots==1 && statusReads==1 && timingReads==1 && device.pins[5].reads==2);
     assert(!spiSnapshots);
-    spiResult=-110;assert(Ace6Input::readTouch(&device,bytes,4)==-110 && spiReads==3);
+    spiResult=-110;assert(PaganiInput::readTouch(&device,bytes,4)==-110 && spiReads==3);
     const uint32_t expected[]={0x101,1,1,0x40000000,1,0};
     assert(spiSnapshots==1 && !memcmp(spiSnapshot,expected,sizeof expected));
-    assert(Ace6Input::readTouch(&device,bytes,sizeof bytes)==-90 && spiReads==3);
-    assert(Ace6Input::readTouch(&device,nullptr,4)==-22 && spiReads==3);
-    assert(Ace6Input::readTouch(&device,bytes,0)==-22 && spiReads==3);
+    assert(PaganiInput::readTouch(&device,bytes,sizeof bytes)==-90 && spiReads==3);
+    assert(PaganiInput::readTouch(&device,nullptr,4)==-22 && spiReads==3);
+    assert(PaganiInput::readTouch(&device,bytes,0)==-22 && spiReads==3);
     assert(spiSnapshots==1);
-    assert(Ace6Input::writeTouch(&device,bytes,4)==-110 && spiWrites==1 && spiSnapshots==2);
-    spiResult=0;assert(!Ace6Input::readTouch(&device,bytes,4) && !device.spi.snap_valid && spiSnapshots==2);
+    assert(PaganiInput::writeTouch(&device,bytes,4)==-110 && spiWrites==1 && spiSnapshots==2);
+    spiResult=0;assert(!PaganiInput::readTouch(&device,bytes,4) && !device.spi.snap_valid && spiSnapshots==2);
     assert(!device.dmaExposed && !dmaSnapshots);
     device.spi.use_dma=1;
-    assert(!Ace6Input::readTouch(&device,bytes,4) && device.dmaExposed && !dmaSnapshots);
-    spiResult=-5;assert(Ace6Input::readTouch(&device,bytes,4)==-5 && dmaSnapshots==1);
+    assert(!PaganiInput::readTouch(&device,bytes,4) && device.dmaExposed && !dmaSnapshots);
+    spiResult=-5;assert(PaganiInput::readTouch(&device,bytes,4)==-5 && dmaSnapshots==1);
     const uint32_t expectedDma[]={4,0,2,1};assert(!memcmp(dmaSnapshot,expectedDma,sizeof expectedDma));
     spiResult=0;
     // Build 54: a successful DMA read containing zeros must retain evidence even though TouchComm rejects it.
-    Ace6Input zero;zero.spi.use_dma=1;spiRxByte=0;
-    s3910 chip={};chip.bus={&zero,Ace6Input::readTouch,Ace6Input::writeTouch,[](void *,unsigned){}};
+    PaganiInput zero;zero.spi.use_dma=1;spiRxByte=0;
+    s3910 chip={};chip.bus={&zero,PaganiInput::readTouch,PaganiInput::writeTouch,[](void *,unsigned){}};
     assert(s3910_start(&chip)==-71 && !chip.version && !chip.detail && !strcmp(chip.stage,"header"));
     const uint32_t zeroRead[]={4,0,13,1,0x40,4,4,0xc800};
     assert(readSnapshots==2 && !memcmp(readSnapshot,zeroRead,sizeof zeroRead));
     assert(zero.firstReadCaptured && zero.dmaExposed && !zero.spi.snap_valid);
     spiRxByte=0xa5;
-    Ace6Input shortRead;uint8_t byte=0;
-    assert(!Ace6Input::readTouch(&shortRead,&byte,1) && readSnapshot[0]==1 && readSnapshot[1]==0xa5);
-    Ace6Input failed;spiResult=-110;unsigned before=statusReads,timingBefore=timingReads;
-    assert(Ace6Input::readTouch(&failed,bytes,4)==-110 && !failed.firstReadCaptured);
+    PaganiInput shortRead;uint8_t byte=0;
+    assert(!PaganiInput::readTouch(&shortRead,&byte,1) && readSnapshot[0]==1 && readSnapshot[1]==0xa5);
+    PaganiInput failed;spiResult=-110;unsigned before=statusReads,timingBefore=timingReads;
+    assert(PaganiInput::readTouch(&failed,bytes,4)==-110 && !failed.firstReadCaptured);
     assert(statusReads==before && timingReads==timingBefore && failed.pins[5].reads==1 && failed.pins[4].reads==0);
     spiResult=0;
 }
@@ -133,7 +133,7 @@ static void descriptor(const uint8_t *bytes,size_t length,bool touch) {
 static void edgeContacts() {
     bool state[256]={};
     auto edge=[&](unsigned id,bool changed,bool down,int x,int y) {
-        return ace6_touch_edge(state,id,changed,down,x,y,2048,1024);
+        return pagani_touch_edge(state,id,changed,down,x,y,2048,1024);
     };
     assert(edge(2,true,true,32768,65535));
     assert(edge(2,false,true,32768,32768));
@@ -345,8 +345,8 @@ static MMIO *powerDb;
 struct PowerWindow {
     peripheral_io mapped={};
     bool map(uint64_t address,unsigned size) {
-        if (address==ACE6_TOUCH_RSC) {assert(size==ACE6_TOUCH_RSC_SIZE);mapped=powerRsc->io();}
-        else {assert(address==ACE6_CMD_DB && size==ACE6_CMD_DB_SIZE);mapped=powerDb->io();}
+        if (address==PAGANI_TOUCH_RSC) {assert(size==PAGANI_TOUCH_RSC_SIZE);mapped=powerRsc->io();}
+        else {assert(address==PAGANI_CMD_DB && size==PAGANI_CMD_DB_SIZE);mapped=powerDb->io();}
         return true;
     }
     peripheral_io io() {return mapped;}
@@ -360,17 +360,17 @@ struct PowerHarness {
 };
 static void power() {
     MMIO db=commandDb();auto d=db.io();uint32_t address=0;
-    assert(!rpmh_vrm_address(&d,ACE6_CMD_DB_SIZE,ACE6_TOUCH_VDD,&address) && address==0x40800);
-    assert(!rpmh_vrm_address(&d,ACE6_CMD_DB_SIZE,ACE6_TOUCH_VCC,&address) && address==0x41900);
-    assert(rpmh_vrm_address(&d,ACE6_CMD_DB_SIZE,"L4B",&address)==-19 && db.writes.empty());
+    assert(!rpmh_vrm_address(&d,PAGANI_CMD_DB_SIZE,PAGANI_TOUCH_VDD,&address) && address==0x40800);
+    assert(!rpmh_vrm_address(&d,PAGANI_CMD_DB_SIZE,PAGANI_TOUCH_VCC,&address) && address==0x41900);
+    assert(rpmh_vrm_address(&d,PAGANI_CMD_DB_SIZE,"L4B",&address)==-19 && db.writes.empty());
     db.regs[12]=3u<<16;dbEntry(db,192,"ldob4",0x40800);
-    assert(rpmh_vrm_address(&d,ACE6_CMD_DB_SIZE,"ldob4",&address)==-71);
+    assert(rpmh_vrm_address(&d,PAGANI_CMD_DB_SIZE,"ldob4",&address)==-71);
     db.regs[12]=0xffff0000;assert(rpmh_vrm_address(&d,200,"ldob4",&address)==-71);
-    db=commandDb();db.regs[160]=0x30800;assert(rpmh_vrm_address(&d,ACE6_CMD_DB_SIZE,"ldob4",&address)==-71);
-    db.regs[4]=0;assert(rpmh_vrm_address(&d,ACE6_CMD_DB_SIZE,"ldob16",&address)==-19);
+    db=commandDb();db.regs[160]=0x30800;assert(rpmh_vrm_address(&d,PAGANI_CMD_DB_SIZE,"ldob4",&address)==-71);
+    db.regs[4]=0;assert(rpmh_vrm_address(&d,PAGANI_CMD_DB_SIZE,"ldob16",&address)==-19);
     for (unsigned major: {2u,3u}) {
         Rsc m(major);auto io=m.io();rpmh_result result={};
-        assert(!sm8750_rpmh_vrm_enable(&io,0x40800,ACE6_TOUCH_VDD_MV,&result));
+        assert(!sm8750_rpmh_vrm_enable(&io,0x40800,PAGANI_TOUCH_VDD_MV,&result));
         assert(result.tcs==0 && result.status==1 && result.command[2]==0x10100 && m.regs[0xd00]==0x87);
         assert(!m.regs[0xd04] && !m.regs[0xd00+m.control] && !m.regs[0xd00+m.enable] && !m.regs[0xd00+m.wait]);
         for (unsigned i=0;i<3;++i) {
@@ -408,7 +408,7 @@ static void power() {
 static void spiTiming() {
     MMIO m;auto io=m.io();uint32_t readback=0;
     m.regs[0x278]=0xfffff;
-    assert(!sm8750_spi_timing(&io,ACE6_TOUCH_CS_DELAY,ACE6_TOUCH_WORD_DELAY,&readback));
+    assert(!sm8750_spi_timing(&io,PAGANI_TOUCH_CS_DELAY,PAGANI_TOUCH_WORD_DELAY,&readback));
     assert(m.regs[0x278]==0xc800 && readback==0xc800 && m.writes.size()==1);
     m.writes.clear();assert(sm8750_spi_timing(&io,1024,0,&readback)==-22 && m.writes.empty());
     assert(sm8750_spi_timing(&io,0,1024,&readback)==-22 && m.writes.empty());
@@ -459,20 +459,20 @@ static void touch() {
     bus.message(0x10,std::vector<uint8_t>(24));assert(s3910_poll(&d,&frame)==-104 && !d.ready);
 }
 static void buttons() {
-    assert(ace6_buttons(0,1)==0 && ace6_buttons(0x80,1)==2);
-    assert(ace6_buttons(0x40,1)==4 && ace6_buttons(0,0)==8 && ace6_buttons(0xc0,0)==14);
+    assert(pagani_buttons(0,1)==0 && pagani_buttons(0x80,1)==2);
+    assert(pagani_buttons(0x40,1)==4 && pagani_buttons(0,0)==8 && pagani_buttons(0xc0,0)==14);
     ace6_button_filter f={};
-    assert(ace6_buttons_filter(&f,1,2,0)==0);
-    assert(ace6_buttons_filter(&f,1,0,16)==0);
-    assert(ace6_buttons_filter(&f,1,2,32)==0);
-    assert(ace6_buttons_filter(&f,1,2,63)==0);
-    assert(ace6_buttons_filter(&f,1,2,64)==2);
-    assert(ace6_buttons_filter(&f,1,2,10000)==2); // Long press remains asserted.
-    assert(ace6_buttons_filter(&f,0,2,10001)==0); // A bus failure releases it.
-    assert(ace6_buttons_filter(&f,1,2,10002)==0);
-    assert(ace6_buttons_filter(&f,1,2,10034)==2);
-    assert(ace6_buttons_filter(&f,1,0,10035)==2);
-    assert(ace6_buttons_filter(&f,1,0,10067)==0);
+    assert(pagani_buttons_filter(&f,1,2,0)==0);
+    assert(pagani_buttons_filter(&f,1,0,16)==0);
+    assert(pagani_buttons_filter(&f,1,2,32)==0);
+    assert(pagani_buttons_filter(&f,1,2,63)==0);
+    assert(pagani_buttons_filter(&f,1,2,64)==2);
+    assert(pagani_buttons_filter(&f,1,2,10000)==2); // Long press remains asserted.
+    assert(pagani_buttons_filter(&f,0,2,10001)==0); // A bus failure releases it.
+    assert(pagani_buttons_filter(&f,1,2,10002)==0);
+    assert(pagani_buttons_filter(&f,1,2,10034)==2);
+    assert(pagani_buttons_filter(&f,1,0,10035)==2);
+    assert(pagani_buttons_filter(&f,1,0,10067)==0);
 }
 static void buses() {
     MMIO core,cnfg,obs;auto c=core.io(),f=cnfg.io(),o=obs.io();

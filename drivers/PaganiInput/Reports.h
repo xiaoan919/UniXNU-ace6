@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-2-Clause-Patent
-#ifndef ACE6_INPUT_REPORTS_H
-#define ACE6_INPUT_REPORTS_H
+#ifndef PAGANI_INPUT_REPORTS_H
+#define PAGANI_INPUT_REPORTS_H
 #include <stdint.h>
 // HID layouts follow UniXNU/NativeHidInput (5f3a37c), BSD-2-Clause-Patent.
 #define KEYBOARD \
@@ -20,7 +20,7 @@ static const uint8_t touchDescriptor[]={5,0x0d,9,4,0xa1,1,0x85,3,
 #undef FINGER
 #undef KEYBOARD
 // Keep an edge-origin contact marked through its final lift, even after it moves inward.
-static inline bool ace6_touch_edge(bool state[256],unsigned id,bool changed,bool down,
+static inline bool pagani_touch_edge(bool state[256],unsigned id,bool changed,bool down,
                                      int32_t x,int32_t y,uint32_t edgeX,uint32_t edgeY) {
     if (id>=256) return false;
     if (changed && down) state[id]=x>=0 && x<=65536 && y>=0 && y<=65536 &&

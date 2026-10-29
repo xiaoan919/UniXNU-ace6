@@ -16,7 +16,7 @@ from unittest.mock import patch
 def check_arm64_asm(device, tree, work):
     """Compile the actual multi-instruction templates with Apple's assembler syntax."""
     functions, expected = [], Counter()
-    sources = (tree / 'drivers/Ace6ArmCpu/ArmCpu.cpp', tree / 'drivers/NativeUfs/NativeUfs.cpp',
+    sources = (tree / 'drivers/PaganiArmCpu/ArmCpu.cpp', tree / 'drivers/NativeUfs/NativeUfs.cpp',
                device / 'drivers/BootProgress/BootProgress.c')
 
     def instruction(text):

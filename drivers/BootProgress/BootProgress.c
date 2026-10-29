@@ -59,7 +59,7 @@ extern int snprintf(char *, size_t, const char *, ...);
 static char storage_status[96];
 static char timer_status[96];
 static char display_status[96];
-static char peripheral_status[ACE6_PERIPHERALS][80];
+static char peripheral_status[PAGANI_PERIPHERALS][80];
 static int peripheral_overlay, platform_overlay;
 extern unsigned processor_count, processor_avail_count;
 extern unsigned long gPhysSize;
@@ -368,7 +368,7 @@ void boot_progress_display_status(const char *detail, uint64_t value)
 
 void boot_progress_peripheral(unsigned device, const char *stage, int32_t result, uint32_t value, uint64_t reports)
 {
-    if (device >= ACE6_SPI) return;
+    if (device >= PAGANI_SPI) return;
     static const char *names[] = {"KEYS", "TOUCH", "PANEL"};
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
@@ -383,9 +383,9 @@ void boot_progress_touch_spi(uint32_t firmware, uint32_t disabled, uint32_t stat
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
     if (!panic_state) {
-        snprintf(peripheral_status[ACE6_SPI], sizeof(peripheral_status[ACE6_SPI]),
+        snprintf(peripheral_status[PAGANI_SPI], sizeof(peripheral_status[PAGANI_SPI]),
             "SPI fw=%x if=%x st=%x irq=%x", firmware, disabled, state, irq);
-        snprintf(peripheral_status[ACE6_SPI_FIFO], sizeof(peripheral_status[ACE6_SPI_FIFO]),
+        snprintf(peripheral_status[PAGANI_SPI_FIFO], sizeof(peripheral_status[PAGANI_SPI_FIFO]),
             "SPI FIFO tx=%x rx=%x", tx, rx);
     }
     irq_restore(flags);
@@ -395,7 +395,7 @@ void boot_progress_touch_dma(uint32_t tx, uint32_t rx, uint32_t txin, uint32_t r
 {
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
-    if (!panic_state) snprintf(peripheral_status[ACE6_SPI_FIFO], sizeof(peripheral_status[ACE6_SPI_FIFO]),
+    if (!panic_state) snprintf(peripheral_status[PAGANI_SPI_FIFO], sizeof(peripheral_status[PAGANI_SPI_FIFO]),
         "SPI DMA tx=%x rx=%x ti=%x ri=%x", tx, rx, txin, rxin);
     irq_restore(flags);
 }
@@ -406,9 +406,9 @@ void boot_progress_touch_read(uint32_t length, uint32_t head, uint32_t pins, uin
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
     if (!panic_state) {
-        snprintf(peripheral_status[ACE6_SPI], sizeof(peripheral_status[ACE6_SPI]),
+        snprintf(peripheral_status[PAGANI_SPI], sizeof(peripheral_status[PAGANI_SPI]),
             "SPI RX n=%x h=%08x a=%x/%x rst=%x", length, head, pins&1, (pins>>1)&1, (pins>>2)&3);
-        snprintf(peripheral_status[ACE6_SPI_FIFO], sizeof(peripheral_status[ACE6_SPI_FIFO]),
+        snprintf(peripheral_status[PAGANI_SPI_FIFO], sizeof(peripheral_status[PAGANI_SPI_FIFO]),
             "SPI dma=%x ti=%x ri=%x st=%x dly=%x", dma, txin, rxin, state, delay);
     }
     irq_restore(flags);
@@ -420,9 +420,9 @@ void boot_progress_touch_power(uint32_t address, uint32_t hardware, uint32_t tcs
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
     if (!panic_state) {
-        snprintf(peripheral_status[ACE6_SPI], sizeof(peripheral_status[ACE6_SPI]),
+        snprintf(peripheral_status[PAGANI_SPI], sizeof(peripheral_status[PAGANI_SPI]),
             "PWR a=%x hw=%x t=%x", address, hardware, tcs);
-        snprintf(peripheral_status[ACE6_SPI_FIFO], sizeof(peripheral_status[ACE6_SPI_FIFO]),
+        snprintf(peripheral_status[PAGANI_SPI_FIFO], sizeof(peripheral_status[PAGANI_SPI_FIFO]),
             "PWR st=%x c=%x/%x/%x", state, cmd0, cmd1, cmd2);
     }
     irq_restore(flags);
@@ -434,9 +434,9 @@ void boot_progress_touch_hid(uint32_t binding, uint32_t usage, uint32_t events, 
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
     if (!panic_state) {
-        snprintf(peripheral_status[ACE6_SPI], sizeof(peripheral_status[ACE6_SPI]),
+        snprintf(peripheral_status[PAGANI_SPI], sizeof(peripheral_status[PAGANI_SPI]),
             "HID b=%x use=%x/%x ev=%u/%u e=%u", binding, usage>>16, usage&0xffff, events, digitizers, edges);
-        snprintf(peripheral_status[ACE6_SPI_FIFO], sizeof(peripheral_status[ACE6_SPI_FIFO]),
+        snprintf(peripheral_status[PAGANI_SPI_FIFO], sizeof(peripheral_status[PAGANI_SPI_FIFO]),
             "XY in=%x/%x out=%x/%x mask=%x", input>>16, input&0xffff, (uint32_t)(output>>32), (uint32_t)output, mask);
     }
     irq_restore(flags);
@@ -447,9 +447,9 @@ void boot_progress_touch_smmu(uint32_t slot, uint32_t bank, uint32_t smr, uint32
     uint64_t flags = irq_save();
     if (flags == UINT64_MAX) return;
     if (!panic_state) {
-        snprintf(peripheral_status[ACE6_SPI], sizeof(peripheral_status[ACE6_SPI]),
+        snprintf(peripheral_status[PAGANI_SPI], sizeof(peripheral_status[PAGANI_SPI]),
             "SMMU slot=%x bank=%x", slot, bank);
-        snprintf(peripheral_status[ACE6_SPI_FIFO], sizeof(peripheral_status[ACE6_SPI_FIFO]),
+        snprintf(peripheral_status[PAGANI_SPI_FIFO], sizeof(peripheral_status[PAGANI_SPI_FIFO]),
             "SMMU smr=%x s2cr=%x", smr, s2cr);
     }
     irq_restore(flags);
@@ -474,7 +474,7 @@ void boot_progress_peripheral_frame(void)
     if (flags == UINT64_MAX) return;
     if (!display_owned || panic_state || busy || !framebuffer) { irq_restore(flags); return; }
     char line[80];
-    for (unsigned i = 0; i < (platform ? 2U : ACE6_PERIPHERALS); i++) {
+    for (unsigned i = 0; i < (platform ? 2U : PAGANI_PERIPHERALS); i++) {
         if (platform && i == 0) {
             unsigned timer = 0, ipi = 0;
             for (unsigned cpu = 0; cpu < 8; cpu++) {
@@ -606,7 +606,7 @@ void early_boot_progress_init(boot_args *args)
     poll_count = 0; display_value = 0;
     display_stage[0] = 0; exit_stage[0] = 0;
     peripheral_overlay = 0; platform_overlay = 0;
-    for (unsigned i = 0; i < ACE6_PERIPHERALS; i++) peripheral_status[i][0] = 0;
+    for (unsigned i = 0; i < PAGANI_PERIPHERALS; i++) peripheral_status[i][0] = 0;
     boot_progress_panic_text[0] = 0;
     framebuffer = 0; column = 0; row = LOG_TOP; busy = 0;
     framebuffer_pa = 0;

@@ -35,7 +35,7 @@
 
 - `runtime_merged.dts` 2.1 MB，最权威的设备树
 - `ace6-hardware.md` 362 行，含 64 个 reserved-memory 区域、16 段内存映射
-- `Ace6Peripherals.h` 89 个宏，每个都标注了实测来源
+- `PaganiPeripherals.h` 89 个宏，每个都标注了实测来源
 - `board.toml` / `ace6.dts` / `ace6_defconfig`，静态验证全通过
 
 这部分的价值在于：**后续任何环节出问题，都有唯一可信的参照，不需要回原厂固件反复挖。**

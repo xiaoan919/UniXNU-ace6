@@ -11,7 +11,7 @@ import tempfile
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--tree',type=Path,required=True)
 tree=parser.parse_args().tree.resolve()
-source=tree/'drivers/Ace6Input'
+source=tree/'drivers/PaganiInput'
 spi=tree/'drivers/QcomGeniSpi'
 events=(source/'HidEvents.h').read_text()
 xml=re.search(r'static const char xml\[\] =\s*((?:"(?:[^"\\]|\\.)*"\s*)+);',events).group(1)
@@ -23,9 +23,9 @@ assert personality['IOPropertyMatch']=={'Product':'Ace6 S3910'} and personality[
 assert personality['DeviceUsagePairs']==[{'DeviceUsagePage':13,'DeviceUsage':4}]
 assert personality['PrimaryUsagePage']==13 and personality['PrimaryUsage']==4
 assert all(personality[k] is True for k in ['Built-In','DisplayIntegrated','DigitizerCollectionDispatch'])
-with tempfile.TemporaryDirectory(prefix='ace6-peripherals-') as folder:
+with tempfile.TemporaryDirectory(prefix='pagani-peripherals-') as folder:
     binary=Path(folder)/'peripherals'
-    adapter=(source/'Ace6Input.cpp').read_text()
+    adapter=(source/'PaganiInput.cpp').read_text()
     read=adapter[adapter.index('    int transferTouch('):adapter.index('    static void sleepTouch(')]
     (Path(folder)/'Ace6ReadTouch.inc').write_text(read)
     power=adapter[adapter.index('    int setupTouchPower('):adapter.index('    int setupTouch()')]
