@@ -82,7 +82,6 @@ windows = [
 ]
 
 [firmware]
-patches = ["Resources/MuPatches/OnePlusAce6.patch"]
 config = "ace6"
 dsc = "Platforms/OnePlus/ace6Pkg/ace6.dsc"
 fd = "Build/ace6Pkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"

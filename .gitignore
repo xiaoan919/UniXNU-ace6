@@ -23,3 +23,6 @@ desktop.ini
 __pycache__/
 *.pyc
 
+
+# Workflow needs the 'workflow' OAuth scope; added through the web UI.
+.github/workflows/
