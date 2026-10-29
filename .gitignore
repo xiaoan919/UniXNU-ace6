@@ -24,3 +24,6 @@ __pycache__/
 *.pyc
 
 
+
+# Local module overrides; the pinned feeds.toml carries the real source.
+/local.toml

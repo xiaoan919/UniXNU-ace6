@@ -1,0 +1,14 @@
+# Optional local development overrides. Leave this as .example for CI: the
+# pinned sources in feeds.toml are what the build uses.
+#
+# Copy to local.toml (git-ignored) when you want to build against a checkout
+# that sits next to this repository instead of the pinned git revision.
+#
+# [[source]]
+# name = "sm8750"
+# kind = "soc"
+# local = "../UniXNU-sm8750-common"
+#
+# [local]
+# drivers = "../UniXNU-ace6/drivers"
+# kits = "../UniXNU-ace6/kits"
