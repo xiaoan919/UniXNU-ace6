@@ -1,0 +1,24 @@
+# Keep LF in the repository; the Linux build and the dtc/python tooling expect it.
+* text=auto eol=lf
+
+# Source and config
+*.c     text eol=lf
+*.h     text eol=lf
+*.cpp   text eol=lf
+*.S     text eol=lf
+*.py    text eol=lf
+*.toml  text eol=lf
+*.yml   text eol=lf
+*.md    text eol=lf
+*.dts   text eol=lf
+*.dtsi  text eol=lf
+*.patch text eol=lf
+
+# Binary must stay binary
+*.img   binary
+*.dtb   binary
+*.efi   binary
+*.fd    binary
+*.bin   binary
+*.so    binary
+*.ko    binary

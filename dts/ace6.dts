@@ -1,0 +1,60 @@
+/dts-v1/;
+/include/ "sm8750.dtsi"
+
+/*
+ * OnePlus Ace 6 (PLQ110 / OP6113L1) — Xiaomi-independent, SM8750 "Sun" v1.
+ *
+ * Every value below was read from this device:
+ *   runtime DT  : /sys/firmware/fdt  (1401819 B -> base+overlay merged)
+ *   overlays    : dtbo_b  (DT_TABLE, 10 entries, board-id 0x50008)
+ *   base        : vendor_boot_b  dtb @ 0x11a1000  (13 concatenated FDTs)
+ *   identity    : soc_id 618 (0x26a), machine SUN, revision 2.0
+ *
+ * Board model string: "Qualcomm Technologies, Inc. Sun MTP,ktm-g_ti"
+ * oplus project 0x6113 = 24851
+ */
+
+/ {
+    model = "OnePlus Ace 6 PLQ110";
+    compatible = "oneplus,plq110", "qcom,sm8750", "qcom,sun";
+
+    /* Segment 11 of the measured 16-segment map; identical to the 13T layout. */
+    memory@980000000 {
+        device_type = "memory";
+        reg = <0x9 0x80000000 0x1 0x80000000>;
+    };
+
+    /* Second usable high window: base 0x8c0000000, size 0xc0000000 (3 GiB). */
+    memory@8c0000000 {
+        device_type = "memory";
+        reg = <0x8 0xc0000000 0x0 0xc0000000>;
+    };
+};
+
+/* ---- CPU: cluster0 = cpu0..cpu5 (medium), cluster1 = cpu6..cpu7 (large) ---- */
+&cpu0 { status = "okay"; };
+&cpu1 { status = "okay"; };
+&cpu2 { status = "okay"; };
+&cpu3 { status = "okay"; };
+&cpu4 { status = "okay"; };
+&cpu5 { status = "okay"; };
+&cpu6 { status = "okay"; };
+&cpu7 { status = "okay"; };
+
+/* ---- GPU: Adreno830v2, chipid confirmed by kgsl and by the DT ---- */
+&gpu {
+    qcom,chipid = <0x44050001>;
+    qcom,gpu-model = "Adreno830v2";
+    status = "okay";
+};
+
+&gcc { status = "okay"; };
+&gpucc { status = "okay"; };
+
+/* ---- UFS: SID 0x60, 2 lanes, ICE + MCQ segments ---- */
+&ufs {
+    status = "okay";
+};
+
+&smmu { status = "okay"; };
+&gpu_smmu { status = "okay"; };

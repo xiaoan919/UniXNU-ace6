@@ -1,0 +1,56 @@
+/*
+ * Synaptics S3910 touch, OnePlus Ace 6 (PLQ110).
+ *
+ * Source of every value (device-measured, see docs/hardware.md):
+ *   runtime DT  : synaptics: synaptics@0        (compatible "synaptics-tcm", okay)
+ *   runtime DT  : qupv3_se4_spi: spi@a90000     (reg 0xa90000+0x4000, irq 0x165)
+ *   runtime DT  : hbp_spi@0                     (compatible "oplus,hbp_spi_bus")
+ *   overlay     : synaptics_tcm_hbp@0           (status="disabled", reference only)
+ *
+ * IMPORTANT: the ACTIVE path on this device is "synaptics-tcm" attached to
+ * hbp_spi_bus. The "synaptics,tcm-spi-hbp" child of qupv3_se4_spi is disabled
+ * and must not be used as the implementation template.
+ */
+
+&qupv3_se4_spi {
+    status = "okay";
+
+    hbp_spi_bus0: hbp_spi@0 {
+        compatible = "oplus,hbp_spi_bus";
+        reg = <0x00>;
+        status = "okay";
+        spi-max-frequency = <0x121eac0>;   /* 19 MHz, measured */
+        bus,spi-mode = <0x00>;
+        bus,rx-dummy = <0x00>;
+        bus,tx-dummy = <0x00>;
+        spi-cs-setup = <0x32 0x00>;        /* 50, measured */
+    };
+};
+
+/* The SE that hosts touch is SPI-only; its I2C personality is disabled. */
+&qupv3_se4_i2c {
+    status = "disabled";
+};
+
+&soc {
+    synaptics_touch: synaptics@0 {
+        compatible = "synaptics-tcm";
+        status = "okay";
+        device,id = <0x00>;
+        device,chip_name = "synaptics-s3910";
+        device,resolution = <0x4f80 0xaf00>;   /* 20352 x 44800, measured */
+        interrupt-parent = <&tlmm>;
+        interrupts = <0xa2 0x2008>;
+        irq-gpio = <&tlmm 0xa2 0x2008>;
+        spi,cs_active = <0x00>;
+        power,vddi-supply = <&L4B>;
+        power,vddi_volt = <0x1b7740 0x1b7740>;  /* 1.8 V fixed */
+        device,attached_bus = <&hbp_spi_bus0>;
+        create_with_power_on_support;
+
+        /* Panel-specific branch; tx/rx measured on this unit. */
+        S3910_PANEL7 {
+            touchpanel,tx-rx-num = <0x12 0x28>;   /* 18 x 40 */
+        };
+    };
+};

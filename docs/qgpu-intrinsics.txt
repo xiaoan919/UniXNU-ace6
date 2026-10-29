@@ -1,0 +1,1370 @@
+# QGPU/Adreno 8xx LLVM intrinsics
+# source: /vendor/lib64/libllvm-qgl.so
+# compiler version: E031.47.18.51  product: sun
+# total: 672
+
+## Ldx  (1)
+  llvm.qgpu.Ldx
+
+## Stx  (1)
+  llvm.qgpu.Stx
+
+## absneg  (1)
+  llvm.qgpu.absneg
+
+## accl  (4)
+  llvm.qgpu.accl.conv.f
+  llvm.qgpu.accl.conv.h
+  llvm.qgpu.accl.mm.f
+  llvm.qgpu.accl.mm.h
+
+## acos  (1)
+  llvm.qgpu.acos
+
+## add  (2)
+  llvm.qgpu.add.div2
+  llvm.qgpu.add.mul2
+
+## add64  (1)
+  llvm.qgpu.add64
+
+## alloc  (1)
+  llvm.qgpu.alloc.temp.regs
+
+## andg  (1)
+  llvm.qgpu.andg
+
+## asin  (1)
+  llvm.qgpu.asin
+
+## atan  (1)
+  llvm.qgpu.atan
+
+## atomic  (16)
+  llvm.qgpu.atomic.add.oob
+  llvm.qgpu.atomic.and.oob
+  llvm.qgpu.atomic.cmp.xchg.oob
+  llvm.qgpu.atomic.dec.oob
+  llvm.qgpu.atomic.dec.range
+  llvm.qgpu.atomic.imax.oob
+  llvm.qgpu.atomic.imin.oob
+  llvm.qgpu.atomic.inc.oob
+  llvm.qgpu.atomic.inc.range
+  llvm.qgpu.atomic.op.uav
+  llvm.qgpu.atomic.or.oob
+  llvm.qgpu.atomic.umax.oob
+  llvm.qgpu.atomic.umin.oob
+  llvm.qgpu.atomic.work.item.fence
+  llvm.qgpu.atomic.xchg.oob
+  llvm.qgpu.atomic.xor.oob
+
+## atomic64  (13)
+  llvm.qgpu.atomic64.add.oob
+  llvm.qgpu.atomic64.and.oob
+  llvm.qgpu.atomic64.cmp.xchg.oob
+  llvm.qgpu.atomic64.dec.oob
+  llvm.qgpu.atomic64.imax.oob
+  llvm.qgpu.atomic64.imin.oob
+  llvm.qgpu.atomic64.inc.oob
+  llvm.qgpu.atomic64.op.uav
+  llvm.qgpu.atomic64.or.oob
+  llvm.qgpu.atomic64.umax.oob
+  llvm.qgpu.atomic64.umin.oob
+  llvm.qgpu.atomic64.xchg.oob
+  llvm.qgpu.atomic64.xor.oob
+
+## ball  (1)
+  llvm.qgpu.ball
+
+## bany  (1)
+  llvm.qgpu.bany
+
+## bfi  (1)
+  llvm.qgpu.bfi
+
+## bfrev  (1)
+  llvm.qgpu.bfrev
+
+## calc  (2)
+  llvm.qgpu.calc.addr
+  llvm.qgpu.calc.offset.bary.coords
+
+## calculateB  (1)
+  llvm.qgpu.calculateBlockInfo
+
+## cat  (1)
+  llvm.qgpu.cat
+
+## chmask  (1)
+  llvm.qgpu.chmask
+
+## chsh  (1)
+  llvm.qgpu.chsh
+
+## clamp  (1)
+  llvm.qgpu.clamp
+
+## clz  (1)
+  llvm.qgpu.clz
+
+## clzs  (1)
+  llvm.qgpu.clzs
+
+## compose  (1)
+  llvm.qgpu.compose.i64
+
+## conv  (1)
+  llvm.qgpu.conv
+
+## coopmat  (5)
+  llvm.qgpu.coopmat.get.depth
+  llvm.qgpu.coopmat.layout.annotate
+  llvm.qgpu.coopmat.load
+  llvm.qgpu.coopmat.muladd
+  llvm.qgpu.coopmat.store
+
+## create  (2)
+  llvm.qgpu.create.handle.for.lib.f
+  llvm.qgpu.create.handle.for.lib.i
+
+## ctz  (1)
+  llvm.qgpu.ctz
+
+## dccln  (1)
+  llvm.qgpu.dccln
+
+## demote  (1)
+  llvm.qgpu.demote.to.helper.invocation
+
+## dot  (1)
+  llvm.qgpu.dot.product.acc
+
+## dp  (2)
+  llvm.qgpu.dp.imad
+  llvm.qgpu.dp.umad
+
+## dp2  (1)
+  llvm.qgpu.dp2
+
+## dp3  (1)
+  llvm.qgpu.dp3
+
+## dp4  (1)
+  llvm.qgpu.dp4
+
+## dp4acc  (1)
+  llvm.qgpu.dp4acc
+
+## dsx  (1)
+  llvm.qgpu.dsx
+
+## dsxpp  (1)
+  llvm.qgpu.dsxpp
+
+## dsy  (1)
+  llvm.qgpu.dsy
+
+## dsypp  (1)
+  llvm.qgpu.dsypp
+
+## dumpallgpr  (1)
+  llvm.qgpu.dumpallgprs
+
+## emit  (1)
+  llvm.qgpu.emit.vertex
+
+## endvs  (1)
+  llvm.qgpu.endvs
+
+## eval  (1)
+  llvm.qgpu.eval.pulled
+
+## extract  (2)
+  llvm.qgpu.extract.hi
+  llvm.qgpu.extract.lo
+
+## f2hpd  (1)
+  llvm.qgpu.f2hpd
+
+## fake  (3)
+  llvm.qgpu.fake.preamble.begin
+  llvm.qgpu.fake.preamble.end
+  llvm.qgpu.fake.preamble.rejoin
+
+## fceil  (1)
+  llvm.qgpu.fceil
+
+## fchkpt  (1)
+  llvm.qgpu.fchkpt
+
+## fcmpx  (1)
+  llvm.qgpu.fcmpx
+
+## fcombine10  (1)
+  llvm.qgpu.fcombine10
+
+## fcombine11  (1)
+  llvm.qgpu.fcombine11
+
+## fcombine12  (1)
+  llvm.qgpu.fcombine12
+
+## fcombine13  (1)
+  llvm.qgpu.fcombine13
+
+## fcombine14  (1)
+  llvm.qgpu.fcombine14
+
+## fcombine15  (1)
+  llvm.qgpu.fcombine15
+
+## fcombine16  (1)
+  llvm.qgpu.fcombine16
+
+## fcombine17  (1)
+  llvm.qgpu.fcombine17
+
+## fcombine18  (1)
+  llvm.qgpu.fcombine18
+
+## fcombine19  (1)
+  llvm.qgpu.fcombine19
+
+## fcombine2  (1)
+  llvm.qgpu.fcombine2
+
+## fcombine20  (1)
+  llvm.qgpu.fcombine20
+
+## fcombine21  (1)
+  llvm.qgpu.fcombine21
+
+## fcombine22  (1)
+  llvm.qgpu.fcombine22
+
+## fcombine23  (1)
+  llvm.qgpu.fcombine23
+
+## fcombine24  (1)
+  llvm.qgpu.fcombine24
+
+## fcombine25  (1)
+  llvm.qgpu.fcombine25
+
+## fcombine26  (1)
+  llvm.qgpu.fcombine26
+
+## fcombine27  (1)
+  llvm.qgpu.fcombine27
+
+## fcombine28  (1)
+  llvm.qgpu.fcombine28
+
+## fcombine29  (1)
+  llvm.qgpu.fcombine29
+
+## fcombine3  (1)
+  llvm.qgpu.fcombine3
+
+## fcombine30  (1)
+  llvm.qgpu.fcombine30
+
+## fcombine31  (1)
+  llvm.qgpu.fcombine31
+
+## fcombine32  (1)
+  llvm.qgpu.fcombine32
+
+## fcombine33  (1)
+  llvm.qgpu.fcombine33
+
+## fcombine34  (1)
+  llvm.qgpu.fcombine34
+
+## fcombine35  (1)
+  llvm.qgpu.fcombine35
+
+## fcombine36  (1)
+  llvm.qgpu.fcombine36
+
+## fcombine37  (1)
+  llvm.qgpu.fcombine37
+
+## fcombine38  (1)
+  llvm.qgpu.fcombine38
+
+## fcombine39  (1)
+  llvm.qgpu.fcombine39
+
+## fcombine4  (1)
+  llvm.qgpu.fcombine4
+
+## fcombine40  (1)
+  llvm.qgpu.fcombine40
+
+## fcombine41  (1)
+  llvm.qgpu.fcombine41
+
+## fcombine42  (1)
+  llvm.qgpu.fcombine42
+
+## fcombine43  (1)
+  llvm.qgpu.fcombine43
+
+## fcombine44  (1)
+  llvm.qgpu.fcombine44
+
+## fcombine45  (1)
+  llvm.qgpu.fcombine45
+
+## fcombine46  (1)
+  llvm.qgpu.fcombine46
+
+## fcombine47  (1)
+  llvm.qgpu.fcombine47
+
+## fcombine48  (1)
+  llvm.qgpu.fcombine48
+
+## fcombine49  (1)
+  llvm.qgpu.fcombine49
+
+## fcombine5  (1)
+  llvm.qgpu.fcombine5
+
+## fcombine50  (1)
+  llvm.qgpu.fcombine50
+
+## fcombine51  (1)
+  llvm.qgpu.fcombine51
+
+## fcombine52  (1)
+  llvm.qgpu.fcombine52
+
+## fcombine53  (1)
+  llvm.qgpu.fcombine53
+
+## fcombine54  (1)
+  llvm.qgpu.fcombine54
+
+## fcombine55  (1)
+  llvm.qgpu.fcombine55
+
+## fcombine56  (1)
+  llvm.qgpu.fcombine56
+
+## fcombine57  (1)
+  llvm.qgpu.fcombine57
+
+## fcombine58  (1)
+  llvm.qgpu.fcombine58
+
+## fcombine59  (1)
+  llvm.qgpu.fcombine59
+
+## fcombine6  (1)
+  llvm.qgpu.fcombine6
+
+## fcombine60  (1)
+  llvm.qgpu.fcombine60
+
+## fcombine61  (1)
+  llvm.qgpu.fcombine61
+
+## fcombine62  (1)
+  llvm.qgpu.fcombine62
+
+## fcombine63  (1)
+  llvm.qgpu.fcombine63
+
+## fcombine64  (1)
+  llvm.qgpu.fcombine64
+
+## fcombine7  (1)
+  llvm.qgpu.fcombine7
+
+## fcombine8  (1)
+  llvm.qgpu.fcombine8
+
+## fcombine9  (1)
+  llvm.qgpu.fcombine9
+
+## fcreate  (63)
+  llvm.qgpu.fcreate.map10
+  llvm.qgpu.fcreate.map11
+  llvm.qgpu.fcreate.map12
+  llvm.qgpu.fcreate.map13
+  llvm.qgpu.fcreate.map14
+  llvm.qgpu.fcreate.map15
+  llvm.qgpu.fcreate.map16
+  llvm.qgpu.fcreate.map17
+  llvm.qgpu.fcreate.map18
+  llvm.qgpu.fcreate.map19
+  llvm.qgpu.fcreate.map2
+  llvm.qgpu.fcreate.map20
+  llvm.qgpu.fcreate.map21
+  llvm.qgpu.fcreate.map22
+  llvm.qgpu.fcreate.map23
+  llvm.qgpu.fcreate.map24
+  llvm.qgpu.fcreate.map25
+  llvm.qgpu.fcreate.map26
+  llvm.qgpu.fcreate.map27
+  llvm.qgpu.fcreate.map28
+  llvm.qgpu.fcreate.map29
+  llvm.qgpu.fcreate.map3
+  llvm.qgpu.fcreate.map30
+  llvm.qgpu.fcreate.map31
+  llvm.qgpu.fcreate.map32
+  llvm.qgpu.fcreate.map33
+  llvm.qgpu.fcreate.map34
+  llvm.qgpu.fcreate.map35
+  llvm.qgpu.fcreate.map36
+  llvm.qgpu.fcreate.map37
+  llvm.qgpu.fcreate.map38
+  llvm.qgpu.fcreate.map39
+  llvm.qgpu.fcreate.map4
+  llvm.qgpu.fcreate.map40
+  llvm.qgpu.fcreate.map41
+  llvm.qgpu.fcreate.map42
+  llvm.qgpu.fcreate.map43
+  llvm.qgpu.fcreate.map44
+  llvm.qgpu.fcreate.map45
+  llvm.qgpu.fcreate.map46
+  llvm.qgpu.fcreate.map47
+  llvm.qgpu.fcreate.map48
+  llvm.qgpu.fcreate.map49
+  llvm.qgpu.fcreate.map5
+  llvm.qgpu.fcreate.map50
+  llvm.qgpu.fcreate.map51
+  llvm.qgpu.fcreate.map52
+  llvm.qgpu.fcreate.map53
+  llvm.qgpu.fcreate.map54
+  llvm.qgpu.fcreate.map55
+  llvm.qgpu.fcreate.map56
+  llvm.qgpu.fcreate.map57
+  llvm.qgpu.fcreate.map58
+  llvm.qgpu.fcreate.map59
+  llvm.qgpu.fcreate.map6
+  llvm.qgpu.fcreate.map60
+  llvm.qgpu.fcreate.map61
+  llvm.qgpu.fcreate.map62
+  llvm.qgpu.fcreate.map63
+  llvm.qgpu.fcreate.map64
+  llvm.qgpu.fcreate.map7
+  llvm.qgpu.fcreate.map8
+  llvm.qgpu.fcreate.map9
+
+## fget  (1)
+  llvm.qgpu.fget.sc.reg
+
+## fldga  (1)
+  llvm.qgpu.fldga
+
+## fldgk  (1)
+  llvm.qgpu.fldgk
+
+## fldlw  (1)
+  llvm.qgpu.fldlw
+
+## fload  (1)
+  llvm.qgpu.fload.component
+
+## floor  (1)
+  llvm.qgpu.floor
+
+## flush  (1)
+  llvm.qgpu.flush.denorm
+
+## fract  (1)
+  llvm.qgpu.fract
+
+## fread  (1)
+  llvm.qgpu.fread.temp.regs
+
+## fsample  (1)
+  llvm.qgpu.fsample
+
+## fsample16  (1)
+  llvm.qgpu.fsample16.packed
+
+## fselx  (1)
+  llvm.qgpu.fselx
+
+## fshuffle  (1)
+  llvm.qgpu.fshuffle
+
+## fstga  (1)
+  llvm.qgpu.fstga
+
+## fstlw  (1)
+  llvm.qgpu.fstlw
+
+## fstore  (1)
+  llvm.qgpu.fstore.component
+
+## fwrite  (1)
+  llvm.qgpu.fwrite.temp.regs
+
+## g2l  (1)
+  llvm.qgpu.g2l
+
+## gather  (1)
+  llvm.qgpu.gather.4x
+
+## gather4x  (1)
+  llvm.qgpu.gather4x
+
+## get  (48)
+  llvm.qgpu.get.as.mesh.payload.buffer
+  llvm.qgpu.get.asptr
+  llvm.qgpu.get.attr.at.vertex
+  llvm.qgpu.get.bary.coord
+  llvm.qgpu.get.barycentric.coord
+  llvm.qgpu.get.cycle
+  llvm.qgpu.get.enqueued.num.sub.groups
+  llvm.qgpu.get.fiber.id
+  llvm.qgpu.get.gpr.base
+  llvm.qgpu.get.kek.device.queue.reg
+  llvm.qgpu.get.kek.event.queue.reg
+  llvm.qgpu.get.kek.profiling.buffer.reg
+  llvm.qgpu.get.kek.work.group.size
+  llvm.qgpu.get.max.sub.group.size
+  llvm.qgpu.get.mesh.global.group.id
+  llvm.qgpu.get.ms.mesh.payload.buffer
+  llvm.qgpu.get.num.sub.groups
+  llvm.qgpu.get.offset
+  llvm.qgpu.get.packed.group.id
+  llvm.qgpu.get.packed.local.id
+  llvm.qgpu.get.packed.relative.group.id
+  llvm.qgpu.get.physical.resource.addr
+  llvm.qgpu.get.pipe.info
+  llvm.qgpu.get.pipe.info.p1v2i32
+  llvm.qgpu.get.printf.buffer.reg
+  llvm.qgpu.get.profile.buffer.base
+  llvm.qgpu.get.resbase
+  llvm.qgpu.get.reslayout
+  llvm.qgpu.get.root.pointer.usage
+  llvm.qgpu.get.rt.hit.stbl.stride
+  llvm.qgpu.get.rt.miss.stbl.stride
+  llvm.qgpu.get.rt.stbl.baseaddr.callable
+  llvm.qgpu.get.rt.stbl.baseaddr.hit
+  llvm.qgpu.get.rt.stbl.baseaddr.miss
+  llvm.qgpu.get.rt.stbl.baseaddr.raygen
+  llvm.qgpu.get.scratch.ptr
+  llvm.qgpu.get.special.const.bool
+  llvm.qgpu.get.special.const.float
+  llvm.qgpu.get.special.const.int
+  llvm.qgpu.get.ssbo.unsized.array.length
+  llvm.qgpu.get.sub.group.id
+  llvm.qgpu.get.subgroup.size
+  llvm.qgpu.get.sym.descriptor.info
+  llvm.qgpu.get.sym.loc.by.enum
+  llvm.qgpu.get.tensor.height
+  llvm.qgpu.get.uche.trap.base.reg
+  llvm.qgpu.get.vpc.for.ptr
+  llvm.qgpu.get.wid
+
+## getbit  (1)
+  llvm.qgpu.getbit
+
+## getone  (1)
+  llvm.qgpu.getone
+
+## gfx  (1)
+  llvm.qgpu.gfx.img
+
+## gl  (1)
+  llvm.qgpu.gl.vk.ldlv
+
+## global  (9)
+  llvm.qgpu.global.fget.reg
+  llvm.qgpu.global.fset.reg
+  llvm.qgpu.global.iget.reg
+  llvm.qgpu.global.iset.reg
+  llvm.qgpu.global.last.reg.use
+  llvm.qgpu.global.last.reg.vuse
+  llvm.qgpu.global.scalar.fset.reg
+  llvm.qgpu.global.scalar.iset.reg
+  llvm.qgpu.global.vec.get.reg
+
+## globalatom  (2)
+  llvm.qgpu.globalatomic.opt.WaveSizeMinusOne
+  llvm.qgpu.globalatomic.opt.log2OfWaveSize
+
+## gpu  (2)
+  llvm.qgpu.gpu.atomic.lock.ptr
+  llvm.qgpu.gpu.ex.lock.ptr
+
+## hcos  (1)
+  llvm.qgpu.hcos
+
+## hsin  (1)
+  llvm.qgpu.hsin
+
+## htan  (1)
+  llvm.qgpu.htan
+
+## iabsneg  (2)
+  llvm.qgpu.iabsneg
+  llvm.qgpu.iabsneg.i32
+
+## iadd  (2)
+  llvm.qgpu.iadd.sat
+  llvm.qgpu.iadd.shr
+
+## ibfe  (1)
+  llvm.qgpu.ibfe
+
+## ichkpt  (1)
+  llvm.qgpu.ichkpt
+
+## icmpx  (1)
+  llvm.qgpu.icmpx
+
+## icombine10  (1)
+  llvm.qgpu.icombine10
+
+## icombine11  (1)
+  llvm.qgpu.icombine11
+
+## icombine12  (1)
+  llvm.qgpu.icombine12
+
+## icombine13  (1)
+  llvm.qgpu.icombine13
+
+## icombine14  (1)
+  llvm.qgpu.icombine14
+
+## icombine15  (1)
+  llvm.qgpu.icombine15
+
+## icombine16  (1)
+  llvm.qgpu.icombine16
+
+## icombine17  (1)
+  llvm.qgpu.icombine17
+
+## icombine18  (1)
+  llvm.qgpu.icombine18
+
+## icombine19  (1)
+  llvm.qgpu.icombine19
+
+## icombine2  (1)
+  llvm.qgpu.icombine2
+
+## icombine20  (1)
+  llvm.qgpu.icombine20
+
+## icombine21  (1)
+  llvm.qgpu.icombine21
+
+## icombine22  (1)
+  llvm.qgpu.icombine22
+
+## icombine23  (1)
+  llvm.qgpu.icombine23
+
+## icombine24  (1)
+  llvm.qgpu.icombine24
+
+## icombine25  (1)
+  llvm.qgpu.icombine25
+
+## icombine26  (1)
+  llvm.qgpu.icombine26
+
+## icombine27  (1)
+  llvm.qgpu.icombine27
+
+## icombine28  (1)
+  llvm.qgpu.icombine28
+
+## icombine29  (1)
+  llvm.qgpu.icombine29
+
+## icombine3  (1)
+  llvm.qgpu.icombine3
+
+## icombine30  (1)
+  llvm.qgpu.icombine30
+
+## icombine31  (1)
+  llvm.qgpu.icombine31
+
+## icombine32  (1)
+  llvm.qgpu.icombine32
+
+## icombine33  (1)
+  llvm.qgpu.icombine33
+
+## icombine34  (1)
+  llvm.qgpu.icombine34
+
+## icombine35  (1)
+  llvm.qgpu.icombine35
+
+## icombine36  (1)
+  llvm.qgpu.icombine36
+
+## icombine37  (1)
+  llvm.qgpu.icombine37
+
+## icombine38  (1)
+  llvm.qgpu.icombine38
+
+## icombine39  (1)
+  llvm.qgpu.icombine39
+
+## icombine4  (1)
+  llvm.qgpu.icombine4
+
+## icombine40  (1)
+  llvm.qgpu.icombine40
+
+## icombine41  (1)
+  llvm.qgpu.icombine41
+
+## icombine42  (1)
+  llvm.qgpu.icombine42
+
+## icombine43  (1)
+  llvm.qgpu.icombine43
+
+## icombine44  (1)
+  llvm.qgpu.icombine44
+
+## icombine45  (1)
+  llvm.qgpu.icombine45
+
+## icombine46  (1)
+  llvm.qgpu.icombine46
+
+## icombine47  (1)
+  llvm.qgpu.icombine47
+
+## icombine48  (1)
+  llvm.qgpu.icombine48
+
+## icombine49  (1)
+  llvm.qgpu.icombine49
+
+## icombine5  (1)
+  llvm.qgpu.icombine5
+
+## icombine50  (1)
+  llvm.qgpu.icombine50
+
+## icombine51  (1)
+  llvm.qgpu.icombine51
+
+## icombine52  (1)
+  llvm.qgpu.icombine52
+
+## icombine53  (1)
+  llvm.qgpu.icombine53
+
+## icombine54  (1)
+  llvm.qgpu.icombine54
+
+## icombine55  (1)
+  llvm.qgpu.icombine55
+
+## icombine56  (1)
+  llvm.qgpu.icombine56
+
+## icombine57  (1)
+  llvm.qgpu.icombine57
+
+## icombine58  (1)
+  llvm.qgpu.icombine58
+
+## icombine59  (1)
+  llvm.qgpu.icombine59
+
+## icombine6  (1)
+  llvm.qgpu.icombine6
+
+## icombine60  (1)
+  llvm.qgpu.icombine60
+
+## icombine61  (1)
+  llvm.qgpu.icombine61
+
+## icombine62  (1)
+  llvm.qgpu.icombine62
+
+## icombine63  (1)
+  llvm.qgpu.icombine63
+
+## icombine64  (1)
+  llvm.qgpu.icombine64
+
+## icombine7  (1)
+  llvm.qgpu.icombine7
+
+## icombine8  (1)
+  llvm.qgpu.icombine8
+
+## icombine9  (1)
+  llvm.qgpu.icombine9
+
+## icreate  (64)
+  llvm.qgpu.icreate.map10
+  llvm.qgpu.icreate.map11
+  llvm.qgpu.icreate.map12
+  llvm.qgpu.icreate.map13
+  llvm.qgpu.icreate.map14
+  llvm.qgpu.icreate.map15
+  llvm.qgpu.icreate.map16
+  llvm.qgpu.icreate.map17
+  llvm.qgpu.icreate.map18
+  llvm.qgpu.icreate.map19
+  llvm.qgpu.icreate.map2
+  llvm.qgpu.icreate.map2.v2i32.i32
+  llvm.qgpu.icreate.map20
+  llvm.qgpu.icreate.map21
+  llvm.qgpu.icreate.map22
+  llvm.qgpu.icreate.map23
+  llvm.qgpu.icreate.map24
+  llvm.qgpu.icreate.map25
+  llvm.qgpu.icreate.map26
+  llvm.qgpu.icreate.map27
+  llvm.qgpu.icreate.map28
+  llvm.qgpu.icreate.map29
+  llvm.qgpu.icreate.map3
+  llvm.qgpu.icreate.map30
+  llvm.qgpu.icreate.map31
+  llvm.qgpu.icreate.map32
+  llvm.qgpu.icreate.map33
+  llvm.qgpu.icreate.map34
+  llvm.qgpu.icreate.map35
+  llvm.qgpu.icreate.map36
+  llvm.qgpu.icreate.map37
+  llvm.qgpu.icreate.map38
+  llvm.qgpu.icreate.map39
+  llvm.qgpu.icreate.map4
+  llvm.qgpu.icreate.map40
+  llvm.qgpu.icreate.map41
+  llvm.qgpu.icreate.map42
+  llvm.qgpu.icreate.map43
+  llvm.qgpu.icreate.map44
+  llvm.qgpu.icreate.map45
+  llvm.qgpu.icreate.map46
+  llvm.qgpu.icreate.map47
+  llvm.qgpu.icreate.map48
+  llvm.qgpu.icreate.map49
+  llvm.qgpu.icreate.map5
+  llvm.qgpu.icreate.map50
+  llvm.qgpu.icreate.map51
+  llvm.qgpu.icreate.map52
+  llvm.qgpu.icreate.map53
+  llvm.qgpu.icreate.map54
+  llvm.qgpu.icreate.map55
+  llvm.qgpu.icreate.map56
+  llvm.qgpu.icreate.map57
+  llvm.qgpu.icreate.map58
+  llvm.qgpu.icreate.map59
+  llvm.qgpu.icreate.map6
+  llvm.qgpu.icreate.map60
+  llvm.qgpu.icreate.map61
+  llvm.qgpu.icreate.map62
+  llvm.qgpu.icreate.map63
+  llvm.qgpu.icreate.map64
+  llvm.qgpu.icreate.map7
+  llvm.qgpu.icreate.map8
+  llvm.qgpu.icreate.map9
+
+## iget  (2)
+  llvm.qgpu.iget.sc.reg
+  llvm.qgpu.iget.system.semantic
+
+## ildga  (1)
+  llvm.qgpu.ildga
+
+## iload  (1)
+  llvm.qgpu.iload.component
+
+## imad  (1)
+  llvm.qgpu.imad
+
+## image  (5)
+  llvm.qgpu.image.atomics
+  llvm.qgpu.image.atomics64
+  llvm.qgpu.image.load
+  llvm.qgpu.image.query
+  llvm.qgpu.image.store
+
+## imax  (1)
+  llvm.qgpu.imax
+
+## img  (1)
+  llvm.qgpu.img
+
+## imin  (1)
+  llvm.qgpu.imin
+
+## internal  (1)
+  llvm.qgpu.internal.alloc.lm
+
+## interp  (1)
+  llvm.qgpu.interp
+
+## interpAt  (1)
+  llvm.qgpu.interpAt
+
+## interpolat  (2)
+  llvm.qgpu.interpolate
+  llvm.qgpu.interpolate.f
+
+## iread  (1)
+  llvm.qgpu.iread.temp.regs
+
+## isam  (1)
+  llvm.qgpu.isam.ext
+
+## isample  (1)
+  llvm.qgpu.isample
+
+## iselge  (1)
+  llvm.qgpu.iselge
+
+## iselgt  (1)
+  llvm.qgpu.iselgt
+
+## iselx  (1)
+  llvm.qgpu.iselx
+
+## ishuffle  (2)
+  llvm.qgpu.ishuffle
+  llvm.qgpu.ishuffle.i32.i32
+
+## istore  (1)
+  llvm.qgpu.istore.component
+
+## isub  (2)
+  llvm.qgpu.isub.sat
+  llvm.qgpu.isub.shr
+
+## iwrite  (1)
+  llvm.qgpu.iwrite.temp.regs
+
+## kill  (1)
+  llvm.qgpu.kill
+
+## l2g  (1)
+  llvm.qgpu.l2g
+
+## lastuse  (1)
+  llvm.qgpu.lastuse
+
+## ldc  (1)
+  llvm.qgpu.ldc
+
+## ldck  (1)
+  llvm.qgpu.ldck
+
+## ldgk  (1)
+  llvm.qgpu.ldgk
+
+## ldibk  (1)
+  llvm.qgpu.ldibk
+
+## ldlv  (1)
+  llvm.qgpu.ldlv
+
+## ldlw  (1)
+  llvm.qgpu.ldlw
+
+## ldraystk  (1)
+  llvm.qgpu.ldraystk
+
+## ldthr  (1)
+  llvm.qgpu.ldthr
+
+## ldx  (3)
+  llvm.qgpu.ldx.add.stx
+  llvm.qgpu.ldx.compare.exchange.strong.stx
+  llvm.qgpu.ldx.compare.exchange.weak.stx
+
+## load  (3)
+  llvm.qgpu.load.from.gmem
+  llvm.qgpu.load.readonly.memory
+  llvm.qgpu.load.uav
+
+## local  (1)
+  llvm.qgpu.local.addr.calc
+
+## mad  (2)
+  llvm.qgpu.mad
+  llvm.qgpu.mad.f32
+
+## mad32  (1)
+  llvm.qgpu.mad32.bf16
+
+## max  (1)
+  llvm.qgpu.max
+
+## maximal  (1)
+  llvm.qgpu.maximal.concurrent.subgroups
+
+## mesh  (1)
+  llvm.qgpu.mesh.emit.indices
+
+## mgen  (1)
+  llvm.qgpu.mgen
+
+## min  (1)
+  llvm.qgpu.min
+
+## mmadsh  (1)
+  llvm.qgpu.mmadsh
+
+## msad  (1)
+  llvm.qgpu.msad
+
+## mul16  (1)
+  llvm.qgpu.mul16
+
+## mulhi  (1)
+  llvm.qgpu.mulhi
+
+## mulhi64  (1)
+  llvm.qgpu.mulhi64
+
+## mulshi  (1)
+  llvm.qgpu.mulshi
+
+## mulshi64  (1)
+  llvm.qgpu.mulshi64
+
+## nop  (1)
+  llvm.qgpu.nop.with.sync
+
+## noptr  (1)
+  llvm.qgpu.noptr.ldck
+
+## opencl  (1)
+  llvm.qgpu.opencl.image.load
+
+## pack  (2)
+  llvm.qgpu.pack.v4i16.to.i32
+  llvm.qgpu.pack.v4i32.to.i32
+
+## pipe  (2)
+  llvm.qgpu.pipe.commit
+  llvm.qgpu.pipe.reserve
+
+## pireduce  (1)
+  llvm.qgpu.pireduce
+
+## post  (1)
+  llvm.qgpu.post.atomic.rmw.sync
+
+## pre  (1)
+  llvm.qgpu.pre.atomic.rmw.sync
+
+## preamble  (2)
+  llvm.qgpu.preamble.begin
+  llvm.qgpu.preamble.end
+
+## printf  (1)
+  llvm.qgpu.printf
+
+## private  (1)
+  llvm.qgpu.private.addr.calc
+
+## ray  (1)
+  llvm.qgpu.ray.fetch.position
+
+## rayid  (1)
+  llvm.qgpu.rayid
+
+## rbi  (1)
+  llvm.qgpu.rbi
+
+## rcp  (1)
+  llvm.qgpu.rcp
+
+## read  (2)
+  llvm.qgpu.read.rgb10a2.comp
+  llvm.qgpu.read.shader.clock
+
+## resetAllGP  (1)
+  llvm.qgpu.resetAllGPRs
+
+## rgetinfo  (1)
+  llvm.qgpu.rgetinfo
+
+## rgetpos  (1)
+  llvm.qgpu.rgetpos
+
+## roundaz  (1)
+  llvm.qgpu.roundaz
+
+## roundne  (1)
+  llvm.qgpu.roundne
+
+## rp  (2)
+  llvm.qgpu.rp.launchid
+  llvm.qgpu.rp.launchsize
+
+## rsq  (1)
+  llvm.qgpu.rsq
+
+## rtu  (1)
+  llvm.qgpu.rtu
+
+## sad  (1)
+  llvm.qgpu.sad
+
+## sampler  (1)
+  llvm.qgpu.sampler
+
+## samplergq  (1)
+  llvm.qgpu.samplergq
+
+## scalar  (1)
+  llvm.qgpu.scalar.ldc
+
+## scale  (1)
+  llvm.qgpu.scale
+
+## selge  (1)
+  llvm.qgpu.selge
+
+## selgt  (1)
+  llvm.qgpu.selgt
+
+## set  (3)
+  llvm.qgpu.set.mesh.attr
+  llvm.qgpu.set.mesh.primitives.vertices.counts
+  llvm.qgpu.set.mesh.special.attr
+
+## setup  (1)
+  llvm.qgpu.setup.bary.derivatives
+
+## sf  (1)
+  llvm.qgpu.sf.nop.sync.for.func.enable
+
+## shb  (1)
+  llvm.qgpu.shb
+
+## shlg  (1)
+  llvm.qgpu.shlg
+
+## shlm  (1)
+  llvm.qgpu.shlm
+
+## shrg  (1)
+  llvm.qgpu.shrg
+
+## shrm  (1)
+  llvm.qgpu.shrm
+
+## sign  (1)
+  llvm.qgpu.sign
+
+## sleep  (1)
+  llvm.qgpu.sleep
+
+## smad24  (1)
+  llvm.qgpu.smad24
+
+## smul24  (1)
+  llvm.qgpu.smul24
+
+## sp  (2)
+  llvm.qgpu.sp.atomic.lock.ptr
+  llvm.qgpu.sp.ex.lock.ptr
+
+## ssbo  (1)
+  llvm.qgpu.ssbo.index
+
+## stga  (1)
+  llvm.qgpu.stga
+
+## stlw  (1)
+  llvm.qgpu.stlw
+
+## store  (3)
+  llvm.qgpu.store.ms.payload.counters
+  llvm.qgpu.store.to.gmem
+  llvm.qgpu.store.uav
+
+## straystk  (1)
+  llvm.qgpu.straystk
+
+## stsc  (1)
+  llvm.qgpu.stsc
+
+## stthr  (1)
+  llvm.qgpu.stthr
+
+## sub  (16)
+  llvm.qgpu.sub.group.ballot.bit.count
+  llvm.qgpu.sub.group.ballot.bit.extract
+  llvm.qgpu.sub.group.ballot.lsb
+  llvm.qgpu.sub.group.ballot.msb
+  llvm.qgpu.sub.group.barrier
+  llvm.qgpu.sub.group.broadcast.first.float
+  llvm.qgpu.sub.group.broadcast.first.int
+  llvm.qgpu.sub.group.broadcast.first.int.v2i32
+  llvm.qgpu.sub.group.broadcast.float
+  llvm.qgpu.sub.group.broadcast.int
+  llvm.qgpu.sub.group.broadcast.int.v2i32
+  llvm.qgpu.sub.group.copy.float
+  llvm.qgpu.sub.group.copy.int
+  llvm.qgpu.sub.group.inverse.ballot
+  llvm.qgpu.sub.group.matmul
+  llvm.qgpu.sub.group.sync
+
+## subgroup  (35)
+  llvm.qgpu.subgroup.ball
+  llvm.qgpu.subgroup.ballot
+  llvm.qgpu.subgroup.bany
+  llvm.qgpu.subgroup.builtin.Gemask
+  llvm.qgpu.subgroup.builtin.Gtmask
+  llvm.qgpu.subgroup.builtin.Lemask
+  llvm.qgpu.subgroup.builtin.Ltmask
+  llvm.qgpu.subgroup.builtin.eqmask
+  llvm.qgpu.subgroup.exclusive.float
+  llvm.qgpu.subgroup.exclusive.int
+  llvm.qgpu.subgroup.exclusive.int.v2i32
+  llvm.qgpu.subgroup.fallequal
+  llvm.qgpu.subgroup.fquadbroadcast
+  llvm.qgpu.subgroup.fquadshuffle
+  llvm.qgpu.subgroup.fquadswap
+  llvm.qgpu.subgroup.fshuffle
+  llvm.qgpu.subgroup.fstore.perwave
+  llvm.qgpu.subgroup.get.active.mask
+  llvm.qgpu.subgroup.getone
+  llvm.qgpu.subgroup.iallequal
+  llvm.qgpu.subgroup.inclusive.float
+  llvm.qgpu.subgroup.inclusive.int
+  llvm.qgpu.subgroup.inclusive.int.v2i32
+  llvm.qgpu.subgroup.iquadbroadcast
+  llvm.qgpu.subgroup.iquadshuffle
+  llvm.qgpu.subgroup.iquadswap
+  llvm.qgpu.subgroup.ishuffle
+  llvm.qgpu.subgroup.istore.movmsk
+  llvm.qgpu.subgroup.istore.perwave
+  llvm.qgpu.subgroup.reduce.float
+  llvm.qgpu.subgroup.reduce.int
+  llvm.qgpu.subgroup.reduce.int.v2i32
+  llvm.qgpu.subgroup.wavematch.float
+  llvm.qgpu.subgroup.wavematch.int
+  llvm.qgpu.subgroup.wavemulti.prefix
+
+## tan  (1)
+  llvm.qgpu.tan
+
+## terminate  (1)
+  llvm.qgpu.terminate.invocation
+
+## texture  (6)
+  llvm.qgpu.texture.getbuf
+  llvm.qgpu.texture.getinfo
+  llvm.qgpu.texture.getlod
+  llvm.qgpu.texture.getpos
+  llvm.qgpu.texture.getsize
+  llvm.qgpu.texture.img
+
+## trunc  (1)
+  llvm.qgpu.trunc
+
+## ttu  (5)
+  llvm.qgpu.ttu
+  llvm.qgpu.ttu.begin
+  llvm.qgpu.ttu.end
+  llvm.qgpu.ttu.init
+  llvm.qgpu.ttu.use
+
+## uadd  (2)
+  llvm.qgpu.uadd.sat
+  llvm.qgpu.uadd.shr
+
+## uav  (2)
+  llvm.qgpu.uav.resfmt
+  llvm.qgpu.uav.resinfo
+
+## ubfe  (1)
+  llvm.qgpu.ubfe
+
+## ubo  (1)
+  llvm.qgpu.ubo.index
+
+## uldga  (1)
+  llvm.qgpu.uldga
+
+## umad  (1)
+  llvm.qgpu.umad
+
+## umad24  (1)
+  llvm.qgpu.umad24
+
+## umad32  (1)
+  llvm.qgpu.umad32
+
+## umadsh  (1)
+  llvm.qgpu.umadsh
+
+## umax  (1)
+  llvm.qgpu.umax
+
+## umin  (1)
+  llvm.qgpu.umin
+
+## umul16  (1)
+  llvm.qgpu.umul16
+
+## umul24  (1)
+  llvm.qgpu.umul24
+
+## umull16  (1)
+  llvm.qgpu.umull16
+
+## unpack  (2)
+  llvm.qgpu.unpack.i32.to.v4i16
+  llvm.qgpu.unpack.i32.to.v4i32
+
+## unroll  (3)
+  llvm.qgpu.unroll.begin
+  llvm.qgpu.unroll.end
+  llvm.qgpu.unroll.fence
+
+## usub  (2)
+  llvm.qgpu.usub.sat
+  llvm.qgpu.usub.shr
+
+## vec  (8)
+  llvm.qgpu.vec.Ldx
+  llvm.qgpu.vec.Ldx.v2i32.p1v2i32.i32.i32
+  llvm.qgpu.vec.Stx
+  llvm.qgpu.vec.Stx.i1.p1v2i32.v2i32.i32.i32
+  llvm.qgpu.vec.ldthr
+  llvm.qgpu.vec.ldthr.v2i32.p1v2i32.i32.i32
+  llvm.qgpu.vec.stthr
+  llvm.qgpu.vec.stthr.p1v2i32.v2i32.i32.i32
+
+## vkptr  (7)
+  llvm.qgpu.vkptr.cast.to.workgroup
+  llvm.qgpu.vkptr.get.base.address
+  llvm.qgpu.vkptr.get.binding.set
+  llvm.qgpu.vkptr.get.bindless.offset
+  llvm.qgpu.vkptr.get.offset
+  llvm.qgpu.vkptr.get.ssbo.offset
+  llvm.qgpu.vkptr.get.stride
+
+## vm  (1)
+  llvm.qgpu.vm.trap
+
+## vpc  (1)
+  llvm.qgpu.vpc.helper.intrinsic
+
+## with  (1)
+  llvm.qgpu.with.fp16.denorm.support
+
+## work  (1)
+  llvm.qgpu.work.group.barrier

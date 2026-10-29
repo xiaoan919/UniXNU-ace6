@@ -1,0 +1,139 @@
+schema_version = 2
+
+[board]
+name = "ace6"
+soc = "SM8750"
+soc_source = "sm8750"
+os_profile = "ipados-17.7.11-21H461"
+description = "OnePlus Ace 6 PLQ110 (OP6113L1): SM8750 Sun v1, 12 GiB, AA605 panel, S3910 touch"
+kit = "ace6"
+
+[ipsw]
+fetch = ["AppleLogo", "KernelCache", "DeviceTree", "StaticTrustCache", "Cryptex1,SystemTrustCache"]
+
+[components]
+# Ace6Panel / Ace6Input must be re-implemented as Ace6Panel / Ace6Input.
+include = ["BootProgress", "NativeAES", "NativeKeyStoreEvents", "NativeMobileDisplay", "NativeRamBlock", "NativeUfs", "NativeVirtioBlock", "Ace6ArmCpu", "Ace6ArmDTPlatform", "Ace6DarwinBoot", "ShengPlatformPower", "Stage7Probe", "NativePrelink", "Ace6VerifiedRoot", "Sm8750Platform", "Ace6Input", "Ace6Panel", "QcomGeniSpi"]
+
+[kernel]
+config_fragments = ["arch:configs/common.config", "soc:configs/sm8750.config", "os:configs/ipados.config"]
+patch_series = ["arch:patches/xnu/series", "soc:patches/xnu/series", "os:patches/xnu/pagani-series", "device:patches/xnu/series"]
+defconfig = "ace6_defconfig"
+archives = [
+  "build-corecrypto-14.py",
+  "build-corecrypto-14.py --namespace",
+  "build-libpthread-kernel.py",
+  "component:Ace6ArmCpu",
+  "component:NativeAES",
+  "component:NativeUfs",
+  "component:NativeVirtioBlock",
+  "component:NativeRamBlock",
+  "component:ShengPlatformPower",
+  "component:NativeMobileDisplay"
+]
+
+[kernel.prelink]
+tool = "kits/NativePrelink/emit_prelink.py"
+kernel = "build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf"
+slide = "-0x1000000"
+early_security_init = "com.apple.driver.AppleMobileFileIntegrity=0xfffffff005ab4ae0"
+roots = [
+  "com.apple.iokit.IOStorageFamily", "com.apple.filesystems.apfs",
+  "com.apple.driver.AppleMobileFileIntegrity", "com.apple.kext.CoreTrust",
+  "com.apple.security.sandbox", "com.apple.driver.ApplePMGR",
+  "com.apple.AppleFSCompression.AppleFSCompressionTypeZlib",
+  "com.apple.iokit.IOSurface", "com.apple.iokit.IOMobileGraphicsFamily",
+  "com.apple.iokit.IOHIDFamily", "com.apple.iokit.IOHIDEventDriver",
+]
+
+[payload]
+skip_setup_tool = "scripts/seed-data-skip-setup.py"
+skip_setup_args = ["--no-auto-dim"]
+volume = "UNIXNUACE6"
+size_mib = 160
+loader = "firmware"
+title = "OnePlus Ace 6 PLQ110: bring-up"
+# 12 GiB physical; keep the owned window at 4 GiB unless DarwinBoot is requalified.
+dram_size = "0x300000000"
+timeout = 10
+kernel_args = ["-v", "serial=0", "debug=0x14e", "cpus=8", "sheng-smp=1", "sheng-smp-gic=1", "armcpu-self-ipi=1", "kt_fixed_zones=240", "native-ufs-root=1", "native-ufs-diagnostics=1", "sheng-pmgr=2", "offline-apfs-load=1", "startup_debug=0", "-no_corpses", "sheng-vsync=60", "sheng-vsync-fixed=1", "offline-mobile-graphics-load=1", "offline-legacy-register=1", "offline-legacy-phase=4", "offline-legacy-gop=1", "offline-legacy-pm=1", "offline-legacy-validate=1", "offline-legacy-transfer=1", "offline-legacy-cpu-present=1", "offline-key-events=1", "sheng-aks=1", "ace6-buttons=1", "ace6-touch=1", "ace6-panel=1", "ace6-platform-status=1"]
+
+[payload.adt]
+ipad_identity = true
+unique_chip_id = "required"
+chip_id = "0x8011"
+packed_data_ramdisk = true
+owned_memory_size = "0x100000000"
+# Regenerate from the first successful boot; the 13T UUID belongs to that device.
+root_match_volume_uuid = "00000000-0000-0000-0000-000000000000"
+
+[bootimg]
+embed_payload = true
+
+[userdata]
+partition = "unixnu"
+# Measured from this device's GPT (4096-byte logical sectors, entry 15).
+first_lba = 4602604
+last_lba = 61655034
+lba_bytes = 4096
+windows = [
+  { name = "OS", component = "OS" },
+  { name = "SystemOS", component = "Cryptex1,SystemOS" },
+]
+
+[firmware]
+patches = ["Resources/MuPatches/OnePlusAce6.patch"]
+config = "ace6"
+dsc = "Platforms/OnePlus/ace6Pkg/ace6.dsc"
+fd = "Build/ace6Pkg/{target}_CLANGPDB/FV/SILICIUM_UEFI.fd"
+submodules = [
+  "Binaries",
+  "Common/Mu",
+  "Common/Mu_OEM_Sample",
+  "Silicon/Silicium/OpensslPkg/Library/OpensslLib/openssl",
+]
+packages = [
+  "{uefi}",
+  "{uefi}/Platforms/OnePlus",
+  "{tree}/package",
+  "{tree}/drivers/Ace6DarwinBoot",
+  "{edk2}",
+  "{uefi}/Common/Mu",
+  "{uefi}/Common/Mu_OEM_Sample",
+  "{uefi}/Silicon/Qualcomm",
+  "{uefi}/Silicon/Silicium",
+]
+
+[firmware.defines]
+DEVICE_MODEL = "ace6"
+ENABLE_SECUREBOOT = "1"
+MEMORY_PROTECTION = "TRUE"
+SHIP_MODE = "FALSE"
+BUILDID_STRING = "ace6-xnu-bringup-20261029"
+
+[device_tree]
+source = "device:dts/ace6.dts"
+include_dirs = ["soc:dts"]
+
+[adt.chosen.u32]
+display-scale = 2
+display-rotation = 0
+
+[adt.defaults.u32]
+sleep-disabled = 1
+
+[adt.product.string]
+model = "PLQ110"
+
+[adt.product.u32]
+thin-bezel = 1
+
+[adt.buttons.string]
+compatible = "buttons"
+device_type = "buttons"
+
+[adt.buttons.strings]
+button-names = ["hold", "voldown", "volup"]
+
+[adt.buttons.u32]
+home-button-type = 2

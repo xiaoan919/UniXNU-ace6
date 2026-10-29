@@ -1,0 +1,162 @@
+schema_version = 1
+
+[device]
+name = "ace6"
+soc = "SM8750"
+os_profile = "ipados-17.7.11-21H461"
+summary = "OnePlus Ace 6 PLQ110: hardware reconnaissance complete, no build has run. Every hardware value below was extracted from this unit (dtbo/boot/vendor_boot/runtime DT/GPT); no component has been compiled or booted yet."
+
+# 本记录只反映真实状态：硬件数据齐备，软件未验证。
+# 任何 area 在真机出现可复现结果之前都保持 planned。
+
+[[area]]
+id = "configuration"
+status = "planned"
+components = ["Ace6ArmDTPlatform", "Ace6ArmCpu"]
+paths = ["board.toml", "feeds.toml", "configs/**", "dts/**", "package/Ace6Peripherals.h", "local.toml", "upstream.rev"]
+inputs = ["SM8750 Sun v1 (soc_id 618 / 0x26a, board-id 0x50008), iPadOS 17.7.11 21H461."]
+configuration = ["schema_version=2; soc_source=sm8750; defconfig ace6_defconfig; 18 components."]
+procedure = ["From UniXNU: ./unixnu defconfig ace6_defconfig -D ../UniXNU-ace6 --local-drivers ../UniXNU-ace6/drivers --local-kits ../UniXNU-ace6/kits; ./unixnu status --json."]
+findings = ["Board identity read from the runtime device tree: model \"Qualcomm Technologies, Inc. Sun MTP,ktm-g_ti\", compatible qcom,sun-mtp/qcom,sun/qcom,sunp-mtp/qcom,sunp/qcom,mtp. oplus project 0x6113 = 24851 matches oplusboot.prjname and the touch node's platform_support_project."]
+completion = ["defconfig resolves; every selected component has a source; status reports the intended overrides and patch order."]
+limits = ["No build has been executed. Component sources are inline under drivers/ and kits/ rather than a modules/ submodule, so --local-drivers/--local-kits are required."]
+next_action = ["Run the first cloud build to expose real toolchain errors."]
+
+[[area]]
+id = "firmware"
+status = "planned"
+components = ["Ace6DarwinBoot"]
+inputs = ["uefi-sheng paganiPkg (13s, CPH2723) as the starting platform package.", "Ace6 framebuffer 1272x2800.", "Ace6 DXE heap extent 0xbe360000+0x16ac3000."]
+configuration = ["No ace6Pkg exists yet. paganiPkg needs 6 changes: DXE_Heap length, FrameBufferWidth/Height, and the four SMBIOS identity strings."]
+findings = ["paganiPkg MemoryMapLib compared entry by entry against the Ace6 runtime DT: 4 exact matches (RSRV0, UEFI_Log, DBI_Dump, Display_Reserved/splash), 14 partial, 9 with no counterpart. The DXE_Heap length in paganiPkg (0x19ca0000) overruns Ace6 usable memory by 49.9 MiB and would cover the hwfence-shmem region at 0xd4e23000."]
+completion = ["ace6Pkg builds a firmware volume with the correct framebuffer and memory map."]
+limits = ["UEFI port not started."]
+next_action = ["Derive ace6Pkg from paganiPkg and correct the memory map."]
+
+[[area]]
+id = "cpu"
+status = "planned"
+components = ["Ace6ArmCpu"]
+inputs = ["8 cores: cluster0 cpu0-cpu5 (phandles 0x10-0x15), cluster1 cpu6-cpu7 (0x16-0x17)."]
+configuration = ["cpu-map taken from the runtime DT."]
+findings = ["Measured max frequencies cpu0/2/4 = 3532800 kHz, cpu6/7 = 4320000 kHz. soc0/platform_version = 65536."]
+completion = ["All eight cores come online under XNU."]
+limits = ["Not booted."]
+next_action = ["Verify after the first successful boot."]
+
+[[area]]
+id = "memory"
+status = "planned"
+components = ["NativeRamBlock"]
+inputs = ["16-segment memory map totaling 11426.7 MiB; MemTotal 11384616 kB.", "64 reserved-memory regions totaling 1305.5 MiB."]
+configuration = ["dram_size 0x300000000 (12 GiB); owned window 0x100000000 (4 GiB) retained until requalified.", "Two declared windows: 0x980000000+0x180000000 and 0x8c0000000+0x0c0000000."]
+findings = ["The 0x980000000/6 GiB segment is byte-identical to the OnePlus 13T DTS node. The second window at 0x8c0000000 (3 GiB) has no 13T counterpart. gpu_microcode_region is only 0x2000 (8 KiB) although gen80000_zap.mbn is 12088 bytes; the ELF program headers show the code segment starts at 0x1000 and is 0x3b4 bytes, so it fits, but ph[2] memsz 0xf38 is unverified."]
+completion = ["DarwinBoot allocates and the kernel sees the intended window."]
+limits = ["Not booted."]
+next_action = ["Confirm the ZAP region size before enabling GPU work."]
+
+[[area]]
+id = "storage"
+status = "planned"
+components = ["NativeUfs", "NativeVirtioBlock"]
+inputs = ["ufshc@1d84000, iommus <&apps_smmu 0x60 0>, 2 lanes, IRQ 265, reset GPIO 215."]
+configuration = ["GPT uses 4096-byte logical sectors; userdata entry 15 spans LBA 4602604..61655034 (217.64 GiB)."]
+findings = ["143 partitions under /dev/block/by-name. Current slot _b. The 13T userdata LBAs (44928768..61705983) belong to a 64 GiB unit and must not be reused."]
+completion = ["Kernel mounts the data volume read-only."]
+limits = ["Not booted."]
+next_action = ["None until a boot image exists."]
+
+[[area]]
+id = "display"
+status = "planned"
+components = ["Ace6Panel", "NativeMobileDisplay"]
+inputs = ["AA605_P_7_A0020 (tianma), 1272x2800, DSI cmd mode, 4 lane."]
+configuration = ["Timings measured from dtbo overlay 00: hfp/hbp/hpw 26/26/2, vfp/vbp/vpw 56/24/2, clock 0x41fb7ac0 at 120 Hz and 0x5140c800 at 144 Hz, bpp 30.", "DSC v18, bpp 8, bpc 10, slice 636x20, 2 encoders."]
+findings = ["Panel node is qcom,mdss_dsi_panel_AA605_P_7_A0020_dsc_cmd; bootargs carry PanelID 0x009A0501 and PanelSN 0x0E09170F13171008. A stale platform_support_project_commandline in the touch node still names P_3; the live node is P_7 and P_3 does not exist."]
+completion = ["A known image renders on the panel."]
+limits = ["Ace6Panel is a rename of PaganiPanel, which only drives DCS 0x51 brightness and 0x28/0x29 blanking. The DCS init sequence for AA605 is still inside the stock kernel and has not been extracted."]
+next_action = ["Extract the AA605 init sequence from the vendor kernel."]
+
+[[area]]
+id = "input"
+status = "planned"
+components = ["Ace6Input"]
+inputs = ["Synaptics S3910 on qupv3_se4_spi at 0xA90000, IRQ 357, 19 MHz, tx-rx 18x40, resolution 20352x44800."]
+configuration = ["tlmm pins 48/49/50/51 plus reset 161 and attn 162; drive strength measured {6,4,6,4,3,3}.", "Power is a single fixed 1.8 V L4B rail; the 13T dual RPMh VRM path does not apply."]
+findings = ["The active node is compatible \"synaptics-tcm\" attached to hbp_spi_bus; the synaptics,tcm-spi-hbp child of qupv3_se4_spi is status disabled and must not serve as the template.", "No SPI node on this SoC declares iommus, so the bypass SID is not in the device tree and is probed at runtime via the ace6-touch-sid boot argument."]
+completion = ["Touch produces HID reports and the lock screen responds."]
+limits = ["S3910.c is protocol-only and portable unchanged; Ace6Input.cpp has been patched for the fixed rail and the runtime SID but has never been compiled against XNU."]
+next_action = ["Determine the real SMMU SID on hardware as described in docs/touch-bringup.md."]
+
+[[area]]
+id = "gpu"
+status = "planned"
+components = []
+inputs = ["Adreno830v2, chipid 0x44050001, GMU 0x3d37000, HFI IRQ 304, GPU SMMU 0x3da0000 with 49-bit IOVA."]
+configuration = ["CONFIG_XNU_NATIVE_ADRENO is not set; legacy display only."]
+findings = ["msm_kgsl.ko contains both gen7_* and gen8_* implementations: 223 of 234 names are shared and 174 have under 10% size difference, so A830 is an evolution of A740 rather than a rewrite. gen8 adds 11 functions including acquire_cp_semaphore and cx_host_irq_handler.", "The shader compiler is not in vulkan.adreno.so; it is libllvm-qgl.so (21.5 MB), backend name Oxili, compiler version E031.47.18.51 built for product sun. 672 llvm.qgpu.* intrinsics were exported. The compiler exposes a native SPIR-V input path; input dispatch is in HighLevelCompiler/lib/LA/gl_core/ContextImpl.cpp line 441."]
+completion = ["GPU submissions complete and a known frame reaches scanout."]
+limits = ["No driver exists. All 28056 function names in libllvm-qgl.so are symbol-stubbed, so code must be located by string cross-reference."]
+next_action = ["Validate the SPIR-V route before writing any GPU code."]
+
+[[area]]
+id = "network"
+status = "planned"
+components = []
+inputs = ["cnss_wlan_region is a dynamic 32 MiB pool."]
+configuration = ["No Wi-Fi component selected."]
+findings = ["Atheros/Ath12k support exists upstream for SM8550 only."]
+completion = ["Wi-Fi associates."]
+limits = ["Out of scope for bring-up."]
+next_action = ["None."]
+
+[[area]]
+id = "audio"
+status = "planned"
+components = []
+inputs = ["wcd939x codec on i2c, tfa98xx amplifiers on i2c 4-0034/4-0035."]
+configuration = ["No audio component selected."]
+findings = ["Hardware identified from /sys/bus/i2c; no driver work started."]
+completion = ["Audio playback works."]
+limits = ["Out of scope for bring-up."]
+next_action = ["None."]
+
+[[area]]
+id = "power"
+status = "planned"
+components = ["ShengPlatformPower"]
+inputs = ["SPMI core 0xc400000, cnfg 0xc42d000, obs 0xc440000; cmd-db at 0x81c60000."]
+configuration = ["pmic_resin, pmic_pwrkey and gpio-keys are present as input devices."]
+findings = ["PPIDs are inherited from the shared PM8550 topology and have not been checked against this board."]
+completion = ["Power keys and suspend behave correctly."]
+limits = ["Not booted."]
+next_action = ["Verify button PPIDs on hardware."]
+
+[[area]]
+id = "packaging"
+status = "planned"
+components = ["NativePrelink", "Ace6VerifiedRoot"]
+inputs = ["Apple kernelcache from iPadOS 17.7.11 21H461."]
+configuration = ["kernel.prelink tool kits/NativePrelink/emit_prelink.py; slide -0x1000000."]
+findings = ["The prelink root list is inherited from the 13T and has not been revalidated against this kernelcache."]
+completion = ["kernel.macho is produced and the payload assembles."]
+limits = ["No kernelcache has been fetched yet."]
+next_action = ["Run the first kernel build."]
+
+[[area]]
+id = "diagnostics"
+status = "planned"
+components = ["BootProgress", "Stage7Probe"]
+inputs = ["BootProgress peripheral status, Stage7Probe peripheral bring-up."]
+configuration = ["ace6-platform-status and ace6-peripheral-status boot arguments."]
+findings = ["Renamed from the Pagani equivalents; the stage-7 probe registers Ace6Input and Ace6Panel static initialisers by their __GLOBAL__sub_I_ symbol names, which now match the renamed source files."]
+completion = ["Logs reach a readable transport during bring-up."]
+limits = ["No log has been captured from this device."]
+next_action = ["Capture the first boot log."]
+
+[[evidence]]
+kind = "host"
+reference = "docs/hardware.md"
+command = "adb shell su -c 'cat /sys/firmware/fdt' > runtime.dtb; dtc -I dtb -O dts runtime.dtb"
+revision = "PLQ110_16.0.10.500(CN01)"
+result = "1401819-byte runtime device tree decompiled to 2137271 bytes. Root model \"Qualcomm Technologies, Inc. Sun MTP,ktm-g_ti\", board-id 0x50008 0x00, msm-id 0x100026a 0x20000 0x100026a 0x10000 0x100027f 0x10000 0x100027f 0x20000."
