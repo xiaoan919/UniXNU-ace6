@@ -69,7 +69,10 @@
 // DIFF: this board's touch node declares only power,vddi-supply = <&L4B>,
 // a fixed 1.8 V rail (regulator-pm-humu-l4, phandle 0x401).
 // There is no equivalent of the 13T 3.1 V vcc rail in the active node.
-#define PAGANI_TOUCH_VDD "L4B"
+// The cmd-db resource name, not the device tree regulator label. The test asserts
+// rpmh_vrm_address(PAGANI_TOUCH_VDD) resolves to 0x40800 and that "L4B" is NOT found,
+// because 0x40800 is ldob4 in the command database.
+#define PAGANI_TOUCH_VDD "ldob4"
 #define PAGANI_TOUCH_VDD_MV 1800
 #define PAGANI_TOUCH_NO_VCC 1
 // L4B is a fixed 1.8 V pm_humu_l4 rail with no cmd-db resource name, so it has
