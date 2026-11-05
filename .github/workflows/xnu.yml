@@ -44,7 +44,7 @@ jobs:
       - name: Checkout UniXNU main fork
         uses: actions/checkout@v4
         with:
-          repository: IssacL04/UniXNU_Enc3l
+          repository: xiaoan919/UniXNU_Enc3l
           ref: ${{ steps.main.outputs.revision }}
           path: main
           submodules: recursive
