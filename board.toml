@@ -30,7 +30,8 @@ archives = [
   "component:NativeVirtioBlock",
   "component:NativeRamBlock",
   "build-pagani-verified-root-probe.py --component os --include-systemos",
-  "component:NativeMobileDisplay"
+  "component:NativeMobileDisplay",
+  "component:ShengPlatformPower"
 ]
 
 [kernel.prelink]
