@@ -37,3 +37,4 @@ CONFIG_XNU_NATIVE_AES_ARCHIVE="{tree}/build/native-aes/libNativeAES.a"
 CONFIG_XNU_NATIVE_VIRTIO_BLOCK_ARCHIVE="{tree}/build/native-virtio-block/libNativeVirtioBlock.a"
 CONFIG_XNU_NATIVE_RAM_BLOCK_ARCHIVE="{tree}/build/native-ram-block/libNativeRamBlock.a"
 # CONFIG_XNU_SOURCE_MOCKFS is not set
+CONFIG_XNU_SHENG_PMGR=y
