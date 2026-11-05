@@ -66,7 +66,11 @@ chip_id = "0x8011"
 packed_data_ramdisk = true
 owned_memory_size = "0x100000000"
 # Regenerate from the first successful boot; the 13T UUID belongs to that device.
-root_match_volume_uuid = "00000000-0000-0000-0000-000000000000"
+# The APFS UUID of the OS volume inside the 21H461 IPSW. Every port uses the same
+# value, because it comes from Apple's image rather than from the board; several
+# scripts hardcode it (build-owner-os-policy.py, check-apfs-component-checkpoints.py).
+# An all-zero value matches no volume, so the kernel would never find its root.
+root_match_volume_uuid = "04769D26-2CA0-4825-B443-E2E5F88300F2"
 
 [bootimg]
 embed_payload = true
