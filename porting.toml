@@ -4,53 +4,75 @@ schema_version = 1
 name = "ace6"
 soc = "SM8750"
 os_profile = "ipados-17.7.11-21H461"
-summary = "OnePlus Ace 6 PLQ110: hardware reconnaissance complete, no build has run. Every hardware value below was extracted from this unit (dtbo/boot/vendor_boot/runtime DT/GPT); no component has been compiled or booted yet."
+summary = "OnePlus Ace 6 PLQ110: hardware reconnaissance complete and the UEFI firmware boots on the unit to the UniXNU menu. The kernel has not linked yet, so every area that depends on XNU stays planned."
 
-# 本记录只反映真实状态：硬件数据齐备，软件未验证。
-# 任何 area 在真机出现可复现结果之前都保持 planned。
+# 本记录只反映真实状态。任何 area 在真机出现可复现结果之前都保持 planned；
+# status 只在有对应证据时才升级。
 
 [[area]]
 id = "configuration"
-status = "planned"
-components = ["PaganiArmDTPlatform", "PaganiArmCpu"]
-paths = ["board.toml", "feeds.toml", "configs/**", "dts/**", "package/PaganiPeripherals.h", "local.toml", "upstream.rev"]
-inputs = ["SM8750 Sun v1 (soc_id 618 / 0x26a, board-id 0x50008), iPadOS 17.7.11 21H461."]
-configuration = ["schema_version=2; soc_source=sm8750; defconfig ace6_defconfig; 18 components."]
-procedure = ["From UniXNU: ./unixnu defconfig ace6_defconfig -D ../UniXNU-ace6 --local-drivers ../UniXNU-ace6/drivers --local-kits ../UniXNU-ace6/kits; ./unixnu status --json."]
-findings = ["Board identity read from the runtime device tree: model \"Qualcomm Technologies, Inc. Sun MTP,ktm-g_ti\", compatible qcom,sun-mtp/qcom,sun/qcom,sunp-mtp/qcom,sunp/qcom,mtp. oplus project 0x6113 = 24851 matches oplusboot.prjname and the touch node's platform_support_project."]
-completion = ["defconfig resolves; every selected component has a source; status reports the intended overrides and patch order."]
-limits = ["No build has been executed. Component sources are inline under drivers/ and kits/ rather than a modules/ submodule, so --local-drivers/--local-kits are required."]
-next_action = ["Run the first cloud build to expose real toolchain errors."]
+status = "host-verified"
+components = ["PaganiArmDTPlatform", "PaganiArmCpu", "Sm8750Platform", "QcomGeniSpi"]
+paths = ["board.toml", "feeds.toml", "configs/**", "dts/**", "package/PaganiPeripherals.h", "patches/**", "scripts/**", "upstream.rev", "modules/**"]
+inputs = ["SM8750 Sun v1 (soc_id 618 / 0x26a, board-id 0x50008), iPadOS 17.7.11 21H461.", "Drivers and kits from xiaoan919/UniXNU-Pagani-Drivers 2ba63b1, UniXNU/QcomGeniSpi eac47ba and IssacL04/UniXNU-sm8750-common b79d675."]
+configuration = ["schema_version=2; soc_source=sm8750; defconfig ace6_defconfig; 17 components selected.", "Drivers and kits are submodules under modules/, linked into drivers/ and kits/ by the workflow before use, so each component resolves to a git HEAD that matches the revision pinned in components.toml."]
+procedure = ["Clone this repository with submodules: git clone --recurse-submodules.", "From the UniXNU tree run ./unixnu defconfig ace6_defconfig -D ../UniXNU-ace6 --local-drivers ../device/drivers --local-kits ../device/kits.", "Run ./unixnu status --json -D ../UniXNU-ace6 and compare the resolved components, sources and patch order against components.toml.", "Run the device checks: test-format2.py, test-kernel-source.py, test-bootimg.py, test-stage6.py, test-stage7.py, test-peripherals.py, test-ram-data.py and test-root-audit.py."]
+findings = ["Board identity read from the runtime device tree: model \"Qualcomm Technologies, Inc. Sun MTP,ktm-g_ti\", compatible qcom,sun-mtp/qcom,sun/qcom,sunp-mtp/qcom,sunp/qcom,mtp. oplus project 0x6113 = 24851 matches oplusboot.prjname and the touch node's platform_support_project.", "The drivers were plain files committed into this repository, so the configuration check read this repository's HEAD instead of the pinned driver revision and could never pass. They are submodules now.", "components.toml did not carry each component's path into its source, so fetch cloned the repository root and a patch entry like component:NativePrelink/patches/x.patch resolved to <repo-root>/patches/x.patch.", "The Ace 6 device tree declares two non-contiguous DRAM windows; the ADT step rejected any board with more than one memory node.", "root_match_volume_uuid was all zeros, which matches no volume, so the kernel would never have found its root."]
+completion = ["defconfig resolves; every selected component has a source; status reports the intended overrides and patch order; the device checks pass."]
+limits = ["The checks have not all run green in one pass yet. Component sources live in modules/ and the workflow links them into drivers/ and kits/; local runs must do the same or point --local-module at each submodule path."]
+next_action = ["Get one complete pass of the configuration checks, then reach the kernel build."]
+
+[[area.evidence]]
+kind = "host"
+reference = "docs/hardware.md"
+command = "unixnu defconfig ace6_defconfig and the eight device checks (test-format2, test-kernel-source, test-bootimg, test-stage6, test-stage7, test-peripherals, test-ram-data, test-root-audit)"
+revision = "7570279b5efe26238dd8a79339291c43548fdbe1"
+result = "defconfig resolves 17 components from three submodules; components.toml pins match each module HEAD; the ADT generator accepts the board's two DRAM windows and emits the OS volume UUID."
+
 
 [[area]]
 id = "firmware"
-status = "planned"
+status = "device-verified"
 components = ["PaganiDarwinBoot"]
-inputs = ["uefi-sheng paganiPkg (13s, CPH2723) as the starting platform package.", "Ace6 framebuffer 1272x2800.", "Ace6 DXE heap extent 0xbe360000+0x16ac3000."]
-configuration = ["No ace6Pkg exists yet. paganiPkg needs 6 changes: DXE_Heap length, FrameBufferWidth/Height, and the four SMBIOS identity strings."]
-findings = ["paganiPkg MemoryMapLib compared entry by entry against the Ace6 runtime DT: 4 exact matches (RSRV0, UEFI_Log, DBI_Dump, Display_Reserved/splash), 14 partial, 9 with no counterpart. The DXE_Heap length in paganiPkg (0x19ca0000) overruns Ace6 usable memory by 49.9 MiB and would cover the hwfence-shmem region at 0xd4e23000."]
-completion = ["ace6Pkg builds a firmware volume with the correct framebuffer and memory map."]
-limits = ["UEFI port not started."]
-next_action = ["Derive ace6Pkg from paganiPkg and correct the memory map."]
+paths = ["uefi/**", "docs/firmware.md", "board.toml"]
+inputs = ["UEFI firmware built from the XNU Mu-Silicium package, FD at 0xA7000000 size 0x300000.", "Ace6 framebuffer 1272x2800 at splash_region 0xfc800000, 0x2b00000 bytes.", "Ace6 DXE heap 0x16ac3000 bytes."]
+configuration = ["ACE6_VENDOR_HW=0 and ACE6_SMBIOS=0: the prebuilt pagani driver set is gated out and the Mu drivers only are used.", "SimpleFbDxe publishes a GOP on the frame buffer the bootloader leaves scanning out; USE_CUSTOM_DISPLAY_DRIVER=0.", "Each module is listed in exactly one of ace6.fdf, Include/DXE.inc and Include/APRIORI.inc, because GenFv refuses a volume carrying one file GUID twice."]
+procedure = ["Build the volume: build_uefi.py -d ace6 -r DEBUG -c -m 0, which writes Build/ace6Pkg/DEBUG_CLANGPDB/FV/SILICIUM_UEFI.fd.", "Assemble a boot image carrying gzip(BootShim + FD) in the kernel field and the device tree appended.", "Load it without writing any partition: fastboot boot Mu-ace6.img.", "Observe the panel: the Project Silicium mark, then the UniXNU menu with the board's own panel and resolution."]
+findings = ["The FD base is 0xA7000000, not the 0xA7100000 used by the reference ports: the uefi_b partition is 5 MiB and the ELF program header loads at 0xA7000000 with filesz 0x2A8000.", "The prebuilt pagani drivers assume the reference board's device paths, so each one stops the boot where it runs: EnvDxeEnhanced asserts in SerialDxe.c:849, XhciDxe in Autogen.c:284, SmbiosDxe in Autogen.c:384 and SPMIDxe the same way. Gating the whole vendor block is what moved the boot from four drivers to thirteen and then into the menu.", "The menu cursor walked on its own because SimpleTextInOutSerial published a text input with no UART behind it; removing it leaves the menu reporting \"No input device\" and booting the default entry on the timer.", "GenFv reported \"the 32th file and 94th file have the same file GUID\" and later the same for UniXNU's own GUID, because ace6.fdf includes DXE.inc and APRIORI.inc and modules were listed in more than one of them."]
+completion = ["The firmware boots on the unit and reaches the UniXNU menu without flashing any partition."]
+limits = ["No key driver exists in the volume, so the menu cannot be driven by the volume and power keys. Volume (input) is a kernel driver and does not run in UEFI. The payload volume is not found: the menu still reports built-in configuration and drivers 0 loaded."]
+next_action = ["Add a UEFI key driver that samples PON and GPIO, or find why the bootloader does not hand the ramdisk to the firmware."]
+
+[[area.evidence]]
+kind = "device"
+reference = "uefi/ace6Pkg/ace6.fdf"
+command = "fastboot boot Mu-ace6.img"
+revision = "7570279b5efe26238dd8a79339291c43548fdbe1"
+result = "Panel shows the Project Silicium mark and then the UniXNU menu at 1272x2800 with four built-in entries. The footer reports drivers 0 loaded / 0 failed, kits 0, acpi 0 and \"No input device: the default entry boots when the timer ends\". Selecting an entry ends at \"Failed to Find an Operating System\" because no payload volume is reachable."
+
 
 [[area]]
 id = "cpu"
 status = "planned"
 components = ["PaganiArmCpu"]
+paths = ["package/PaganiPeripherals.h", "patches/**"]
 inputs = ["8 cores: cluster0 cpu0-cpu5 (phandles 0x10-0x15), cluster1 cpu6-cpu7 (0x16-0x17)."]
-configuration = ["cpu-map taken from the runtime DT."]
-findings = ["Measured max frequencies cpu0/2/4 = 3532800 kHz, cpu6/7 = 4320000 kHz. soc0/platform_version = 65536."]
+configuration = ["cpu-map taken from the runtime DT; MAX_CPUS 8 and MAX_CPU_CLUSTERS 2 in the board config."]
+procedure = ["Apply the device patch series so start.s carries the secondary progress hooks and the eight affinities.", "Build the kernel and boot it.", "Read the CPU state from the boot arguments and the platform status overlay."]
+findings = ["Measured max frequencies cpu0/2/4 = 3532800 kHz, cpu6/7 = 4320000 kHz. soc0/platform_version = 65536.", "The reference port records a scheduler ticket-lock panic on MPIDR affinity 0x200 when more than one core came online before the lock policy was corrected; nothing here has run yet."]
 completion = ["All eight cores come online under XNU."]
-limits = ["Not booted."]
-next_action = ["Verify after the first successful boot."]
+limits = ["Not booted. No kernel has linked for this board."]
+next_action = ["Verify after the first successful kernel link."]
 
 [[area]]
 id = "memory"
 status = "planned"
 components = ["NativeRamBlock"]
+paths = ["package/PaganiPeripherals.h", "dts/**"]
 inputs = ["16-segment memory map totaling 11426.7 MiB; MemTotal 11384616 kB.", "64 reserved-memory regions totaling 1305.5 MiB."]
 configuration = ["dram_size 0x300000000 (12 GiB); owned window 0x100000000 (4 GiB) retained until requalified.", "Two declared windows: 0x980000000+0x180000000 and 0x8c0000000+0x0c0000000."]
-findings = ["The 0x980000000/6 GiB segment is byte-identical to the OnePlus 13T DTS node. The second window at 0x8c0000000 (3 GiB) has no 13T counterpart. gpu_microcode_region is only 0x2000 (8 KiB) although gen80000_zap.mbn is 12088 bytes; the ELF program headers show the code segment starts at 0x1000 and is 0x3b4 bytes, so it fits, but ph[2] memsz 0xf38 is unverified."]
+procedure = ["Decompile dts/ace6.dts with dtc and confirm the memory nodes.", "Run the ADT generator and confirm dram-base, dram-size and darwinboot-memory-size in /device-tree/chosen.", "Boot and read the platform status overlay for the RAM figure."]
+findings = ["The 0x980000000/6 GiB segment is byte-identical to the reference port's DTS node. The second window at 0x8c0000000 (3 GiB) has no counterpart there, which is why the ADT step rejected the board until it stopped requiring exactly one memory node.", "payload.dram_size is the physical total (12 GiB) while the first window is 6 GiB; the old check demanded equality and could never hold.", "gpu_microcode_region is only 0x2000 (8 KiB) although gen80000_zap.mbn is 12088 bytes; the ELF program headers show the code segment starts at 0x1000 and is 0x3b4 bytes, so it fits, but ph[2] memsz 0xf38 is unverified."]
 completion = ["DarwinBoot allocates and the kernel sees the intended window."]
 limits = ["Not booted."]
 next_action = ["Confirm the ZAP region size before enabling GPU work."]
@@ -59,41 +81,49 @@ next_action = ["Confirm the ZAP region size before enabling GPU work."]
 id = "storage"
 status = "planned"
 components = ["NativeUfs", "NativeVirtioBlock"]
+paths = ["board.toml", "package/PaganiPeripherals.h"]
 inputs = ["ufshc@1d84000, iommus <&apps_smmu 0x60 0>, 2 lanes, IRQ 265, reset GPIO 215."]
-configuration = ["GPT uses 4096-byte logical sectors; userdata entry 15 spans LBA 4602604..61655034 (217.64 GiB)."]
-findings = ["143 partitions under /dev/block/by-name. Current slot _b. The 13T userdata LBAs (44928768..61705983) belong to a 64 GiB unit and must not be reused."]
+configuration = ["GPT uses 4096-byte logical sectors; userdata entry 15 spans LBA 4602604..61655034 (217.64 GiB).", "CONFIG_XNU_NATIVE_UFS=y with the root partition named unixnu."]
+procedure = ["Confirm the userdata extent against this unit's GPT before assembling any image.", "Build the UFS bindings against the pinned kernelcache, then the archive.", "Boot and mount the data volume read-only."]
+findings = ["143 partitions under /dev/block/by-name. Current slot _b. The reference port's userdata LBAs (44928768..61705983) belong to a 64 GiB unit and must not be reused here.", "build-native-ufs.py reads compile records the kernel build leaves behind, so it cannot run before the kernel has been configured once."]
 completion = ["Kernel mounts the data volume read-only."]
-limits = ["Not booted."]
-next_action = ["None until a boot image exists."]
+limits = ["Not booted. The userdata image has not been built; that step needs a Linux or macOS host."]
+next_action = ["Build the userdata image on a Linux host once the kernel links."]
 
 [[area]]
 id = "display"
 status = "planned"
 components = ["PaganiPanel", "NativeMobileDisplay"]
+paths = ["package/PaganiPeripherals.h", "patches/**"]
 inputs = ["AA605_P_7_A0020 (tianma), 1272x2800, DSI cmd mode, 4 lane."]
 configuration = ["Timings measured from dtbo overlay 00: hfp/hbp/hpw 26/26/2, vfp/vbp/vpw 56/24/2, clock 0x41fb7ac0 at 120 Hz and 0x5140c800 at 144 Hz, bpp 30.", "DSC v18, bpp 8, bpc 10, slice 636x20, 2 encoders."]
-findings = ["Panel node is qcom,mdss_dsi_panel_AA605_P_7_A0020_dsc_cmd; bootargs carry PanelID 0x009A0501 and PanelSN 0x0E09170F13171008. A stale platform_support_project_commandline in the touch node still names P_3; the live node is P_7 and P_3 does not exist."]
-completion = ["A known image renders on the panel."]
-limits = ["PaganiPanel is a rename of PaganiPanel, which only drives DCS 0x51 brightness and 0x28/0x29 blanking. The DCS init sequence for AA605 is still inside the stock kernel and has not been extracted."]
+procedure = ["Build the legacy display archive with the pinned kernelcache so the ABI checks run.", "Boot and look for the display handoff rows in the platform status overlay.", "Confirm the panel leaves the bootloader's frame into the kernel's scanout."]
+findings = ["Panel node is qcom,mdss_dsi_panel_AA605_P_7_A0020_dsc_cmd; bootargs carry PanelID 0x009A0501 and PanelSN 0x0E09170F13171008. A stale platform_support_project_commandline in the touch node still names P_3; the live node is P_7 and P_3 does not exist.", "In UEFI the panel is already driven: SimpleFbDxe publishes a GOP and the UniXNU menu renders at 1272x2800. That is the firmware path, not this kernel driver."]
+completion = ["A known image renders on the panel from the kernel."]
+limits = ["PaganiPanel only drives DCS 0x51 brightness and 0x28/0x29 blanking. The DCS init sequence for AA605 is still inside the stock kernel and has not been extracted."]
 next_action = ["Extract the AA605 init sequence from the vendor kernel."]
 
 [[area]]
 id = "input"
 status = "planned"
 components = ["PaganiInput"]
+paths = ["package/PaganiPeripherals.h", "docs/touch-bringup.md"]
 inputs = ["Synaptics S3910 on qupv3_se4_spi at 0xA90000, IRQ 357, 19 MHz, tx-rx 18x40, resolution 20352x44800."]
-configuration = ["tlmm pins 48/49/50/51 plus reset 161 and attn 162; drive strength measured {6,4,6,4,3,3}.", "Power is a single fixed 1.8 V L4B rail; the 13T dual RPMh VRM path does not apply."]
-findings = ["The active node is compatible \"synaptics-tcm\" attached to hbp_spi_bus; the synaptics,tcm-spi-hbp child of qupv3_se4_spi is status disabled and must not serve as the template.", "No SPI node on this SoC declares iommus, so the bypass SID is not in the device tree and is probed at runtime via the pagani-touch-sid boot argument."]
+configuration = ["tlmm pins 48/49/50/51 plus reset 161 and attn 162; drive strength measured {6,4,6,4,3,3}.", "Power is a single fixed 1.8 V L4B rail; the reference port's dual RPMh VRM path does not apply."]
+procedure = ["Confirm the node that is actually enabled: the synaptics,tcm-spi-hbp child of qupv3_se4_spi is status disabled and is served by hbp_spi@0 (oplus,hbp_spi_bus) instead.", "Boot with pagani-touch-sid set to sweep candidate SMMU SIDs, because no SPI node on this SoC declares iommus.", "Read the platform status rows: SPI fw/if/st/irq, then TOUCH T<n> <command> <stage>, then HID b/use/ev and XY in/out/mask."]
+findings = ["No SPI node on this SoC declares iommus, so the bypass SID is not in the device tree and is probed at runtime. PaganiInput.cpp carries that adaptation: pagani_touch_smmu_sid() reads the pagani-touch-sid boot argument and falls back to PAGANI_TOUCH_SMMU_SID, and smmuActive records whether a translation context was actually programmed.", "The reference port's own record shows the S3910 producing valid protocol and contact frames through SE DMA (build 56: header a5 10 1c 00, HID report r=0, nonzero contact mask on press and zero on release), with swipes and a power-menu Cancel tap still unresponsive. That is the reference hardware, not this board."]
 completion = ["Touch produces HID reports and the lock screen responds."]
-limits = ["S3910.c is protocol-only and portable unchanged; PaganiInput.cpp has been patched for the fixed rail and the runtime SID but has never been compiled against XNU."]
+limits = ["Never compiled against XNU for this board. GPI DMA, v1 command fragmentation, firmware recovery and HID hot-unplug are not implemented upstream either."]
 next_action = ["Determine the real SMMU SID on hardware as described in docs/touch-bringup.md."]
 
 [[area]]
 id = "gpu"
 status = "planned"
 components = []
+paths = ["package/PaganiPeripherals.h"]
 inputs = ["Adreno830v2, chipid 0x44050001, GMU 0x3d37000, HFI IRQ 304, GPU SMMU 0x3da0000 with 49-bit IOVA."]
-configuration = ["CONFIG_XNU_NATIVE_ADRENO is not set; legacy display only."]
+configuration = ["CONFIG_XNU_NATIVE_ADRENO is not set; software rendering only."]
+procedure = ["Capture the KGSL module from the running Android build.", "Compare the gen7_* and gen8_* implementations that the module contains.", "Decide whether the shader compiler can be reached through its SPIR-V input path before writing any driver."]
 findings = ["msm_kgsl.ko contains both gen7_* and gen8_* implementations: 223 of 234 names are shared and 174 have under 10% size difference, so A830 is an evolution of A740 rather than a rewrite. gen8 adds 11 functions including acquire_cp_semaphore and cx_host_irq_handler.", "The shader compiler is not in vulkan.adreno.so; it is libllvm-qgl.so (21.5 MB), backend name Oxili, compiler version E031.47.18.51 built for product sun. 672 llvm.qgpu.* intrinsics were exported. The compiler exposes a native SPIR-V input path; input dispatch is in HighLevelCompiler/lib/LA/gl_core/ContextImpl.cpp line 441."]
 completion = ["GPU submissions complete and a known frame reaches scanout."]
 limits = ["No driver exists. All 28056 function names in libllvm-qgl.so are symbol-stubbed, so code must be located by string cross-reference."]
@@ -103,31 +133,37 @@ next_action = ["Validate the SPIR-V route before writing any GPU code."]
 id = "network"
 status = "planned"
 components = []
+paths = ["package/PaganiPeripherals.h"]
 inputs = ["cnss_wlan_region is a dynamic 32 MiB pool."]
 configuration = ["No Wi-Fi component selected."]
-findings = ["Atheros/Ath12k support exists upstream for SM8550 only."]
+procedure = ["Identify the WLAN part from the running Android build.", "Look for a matching driver in the upstream catalog before writing one."]
+findings = ["Atheros/Ath12k support exists upstream for SM8550 only.", "The reference driver repository gained Wi-Fi work after the revision this port pins, so a newer pin would bring code that has never been reviewed here."]
 completion = ["Wi-Fi associates."]
-limits = ["Out of scope for bring-up."]
-next_action = ["None."]
+limits = ["Out of scope for bring-up. No component selected."]
+next_action = ["None during bring-up."]
 
 [[area]]
 id = "audio"
 status = "planned"
 components = []
+paths = ["package/PaganiPeripherals.h"]
 inputs = ["wcd939x codec on i2c, tfa98xx amplifiers on i2c 4-0034/4-0035."]
 configuration = ["No audio component selected."]
+procedure = ["Identify the codec and amplifiers from /sys/bus/i2c on the running build.", "Look for a matching driver upstream before writing one."]
 findings = ["Hardware identified from /sys/bus/i2c; no driver work started."]
 completion = ["Audio playback works."]
-limits = ["Out of scope for bring-up."]
-next_action = ["None."]
+limits = ["Out of scope for bring-up. No component selected."]
+next_action = ["None during bring-up."]
 
 [[area]]
 id = "power"
 status = "planned"
-components = ["ShengPlatformPower"]
+components = []
+paths = ["package/PaganiPeripherals.h"]
 inputs = ["SPMI core 0xc400000, cnfg 0xc42d000, obs 0xc440000; cmd-db at 0x81c60000."]
-configuration = ["pmic_resin, pmic_pwrkey and gpio-keys are present as input devices."]
-findings = ["PPIDs are inherited from the shared PM8550 topology and have not been checked against this board."]
+configuration = ["PON PPID 0x013, GPIO PPID 0x18d; PON bit 7 power, bit 6 volume up, active-low GPIO volume down.", "A 32 ms filter debounces both edges and failed reads release all keys."]
+procedure = ["Read the PON and GPIO peripherals over SPMI and decode the three keys.", "Confirm the PPIDs against this board rather than assuming the shared PM8550 topology.", "Check that a short power press reaches the kernel and a long press opens the shutdown UI."]
+findings = ["PPIDs are inherited from the shared PM8550 topology and have not been checked against this board.", "In UEFI the same PON and GPIO registers are the only plausible key source, since the vendor ButtonsDxe depends on the reference board's device paths and asserts here."]
 completion = ["Power keys and suspend behave correctly."]
 limits = ["Not booted."]
 next_action = ["Verify button PPIDs on hardware."]
@@ -135,28 +171,32 @@ next_action = ["Verify button PPIDs on hardware."]
 [[area]]
 id = "packaging"
 status = "planned"
-components = ["NativePrelink", "PaganiVerifiedRoot"]
-inputs = ["Apple kernelcache from iPadOS 17.7.11 21H461."]
-configuration = ["kernel.prelink tool kits/NativePrelink/emit_prelink.py; slide -0x1000000."]
-findings = ["The prelink root list is inherited from the 13T and has not been revalidated against this kernelcache."]
-completion = ["kernel.macho is produced and the payload assembles."]
-limits = ["No kernelcache has been fetched yet."]
-next_action = ["Run the first kernel build."]
+components = ["NativePrelink", "PaganiVerifiedRoot", "NativeAES", "NativeKeyStoreEvents"]
+paths = ["board.toml", "upstream.rev"]
+inputs = ["Apple kernelcache from iPadOS 17.7.11 21H461, 46415872 bytes after decoding."]
+configuration = ["kernel.prelink tool kits/NativePrelink/emit_prelink.py; slide -0x1000000.", "kernelcache_sha256 f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7."]
+procedure = ["Fetch the IPSW and decode the kernelcache: strip the IM4P DER wrapper, decompress the bvx2 LZFSE payload, take the arm64 slice and check the sha256 against the pin.", "Run the prelink tool against the decoded kernelcache.", "Assemble the payload volume and the boot image, then verify the readback."]
+findings = ["The kernelcache decodes to a 46 MB Mach-O whose sha256 matches the pin, so every hardcoded slot and vtable offset in the drivers was read against this exact image.", "mkbootimg.py writes ramdisk_size 0 for a v4 image even when --ramdisk is given, so the boot image has to be packed by hand.", "The ADT is generated from the device tree and needs the OS volume UUID 04769D26-2CA0-4825-B443-E2E5F88300F2, which comes from Apple's image rather than the board."]
+completion = ["kernel.macho is produced and the payload assembles and verifies."]
+limits = ["No kernel has linked yet, so no kernel.macho exists."]
+next_action = ["Reach the kernel build step."]
 
 [[area]]
 id = "diagnostics"
 status = "planned"
 components = ["BootProgress", "Stage7Probe"]
+paths = ["patches/**", "docs/touch-bringup.md"]
 inputs = ["BootProgress peripheral status, Stage7Probe peripheral bring-up."]
-configuration = ["pagani-platform-status and pagani-peripheral-status boot arguments."]
-findings = ["Renamed from the Pagani equivalents; the stage-7 probe registers PaganiInput and PaganiPanel static initialisers by their __GLOBAL__sub_I_ symbol names, which now match the renamed source files."]
+configuration = ["pagani-platform-status and pagani-peripheral-status boot arguments.", "Early boot progress patches add the progress hooks to start.s, vm_init.c and the panic paths."]
+procedure = ["Apply the early progress patches and confirm start.s carries the secondary and exception-vector progress hooks.", "Boot and read the platform status overlay below the camera cutout.", "For touch, read the SPI and TOUCH rows; for keys, read the PMIC sample row."]
+findings = ["The stage-7 probe registers the input and panel static initialisers by their __GLOBAL__sub_I_ symbol names, and those names must match the renamed source files or the constructors never run.", "The device patch series was empty, so none of the progress hooks existed. That is a missing capability, not only a failing check."]
 completion = ["Logs reach a readable transport during bring-up."]
-limits = ["No log has been captured from this device."]
-next_action = ["Capture the first boot log."]
+limits = ["No kernel log has been captured from this device; only the UEFI firmware serial output has been seen."]
+next_action = ["Capture the first kernel log once it links."]
 
 [[evidence]]
 kind = "host"
 reference = "docs/hardware.md"
 command = "adb shell su -c 'cat /sys/firmware/fdt' > runtime.dtb; dtc -I dtb -O dts runtime.dtb"
-revision = "PLQ110_16.0.10.500(CN01)"
+revision = "7570279b5efe26238dd8a79339291c43548fdbe1"
 result = "1401819-byte runtime device tree decompiled to 2137271 bytes. Root model \"Qualcomm Technologies, Inc. Sun MTP,ktm-g_ti\", board-id 0x50008 0x00, msm-id 0x100026a 0x20000 0x100026a 0x10000 0x100027f 0x10000 0x100027f 0x20000."
