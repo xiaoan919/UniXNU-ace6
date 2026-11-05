@@ -27,3 +27,8 @@ __pycache__/
 
 # Local module overrides; the pinned feeds.toml carries the real source.
 /local.toml
+
+# Drivers and kits come from modules/* submodules; the workflow links them
+# into these directories before use.
+/drivers/
+/kits/
