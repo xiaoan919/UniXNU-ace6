@@ -41,6 +41,34 @@ jobs:
       # The three do not share one layout, so link each component into the flat
       # drivers/ and kits/ directories the driver expects. Symlinks keep git
       # scoping: git -C follows the link and finds the submodule .git above it.
+      - name: Read the maintained main fork pin
+        id: main
+        run: |
+          revision=$(cat device/upstream.rev)
+          [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
+          echo "revision=$revision" >> "$GITHUB_OUTPUT"
+          echo "pinned main: $revision"
+
+      - name: Checkout UniXNU main fork
+        uses: actions/checkout@v4
+        with:
+          repository: xiaoan919/UniXNU_Enc3l
+          ref: ${{ steps.main.outputs.revision }}
+          path: main
+          submodules: recursive
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install host tools and check the SDK
+        run: |
+          brew install cmake ninja unifdef llvm mtools openssl@3 dtc
+          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-path
+
       - name: Link submodule components into drivers and kits
         working-directory: device
         run: |
@@ -76,44 +104,6 @@ jobs:
           test -f drivers/BootProgress/BootProgress.c
           echo "BootProgress.c reachable through the link"
 
-      - name: Link submodule components into drivers and kits
-        working-directory: device
-        run: |
-          set -eu
-          mkdir -p drivers kits
-          for d in modules/Pagani/drivers/*; do ln -sfn "../../$d" "drivers/$(basename "$d")"; done
-          for d in modules/Pagani/kits/*; do ln -sfn "../../$d" "kits/$(basename "$d")"; done
-          ln -sfn "../../modules/Sm8750Platform/kits/Sm8750Platform" kits/Sm8750Platform
-          ln -sfn "../../modules/QcomGeniSpi" drivers/QcomGeniSpi
-          ls -1 drivers kits
-
-      - name: Read the maintained main fork pin
-        id: main
-        run: |
-          revision=$(cat device/upstream.rev)
-          [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
-          echo "revision=$revision" >> "$GITHUB_OUTPUT"
-          echo "pinned main: $revision"
-
-      - name: Checkout UniXNU main fork
-        uses: actions/checkout@v4
-        with:
-          repository: xiaoan919/UniXNU_Enc3l
-          ref: ${{ steps.main.outputs.revision }}
-          path: main
-          submodules: recursive
-          persist-credentials: false
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install host tools and check the SDK
-        run: |
-          brew install cmake ninja unifdef llvm mtools openssl@3 dtc
-          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
-          xcodebuild -version
-          xcrun --sdk iphoneos --show-sdk-path
 
       - name: Resolve profiles and fetch pinned sources
         working-directory: main
