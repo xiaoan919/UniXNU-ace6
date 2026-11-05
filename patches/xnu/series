@@ -1,1 +1,13 @@
-# Ace 6 kernel patch series (empty until bring-up).
+# Ace 6 kernel patch series.
+#
+# These come from the reference port. They patch general XNU code (arm64 start.s,
+# the vm bootstrap path, panic output) rather than anything board specific, and
+# test-format2 asserts that the resulting start.s carries the early progress
+# hooks, so they are not optional.
+pagani-bootstrap.patch
+zzzz-boot-progress-panic-output.patch
+zzzz-early-boot-progress.patch
+zzzzz-root-panic-progress.patch
+zzzzzz-vm-bootstrap-progress.patch
+zzzzzzz-early-framebuffer-page-tables.patch
+ticket-lock-diagnostics.patch
