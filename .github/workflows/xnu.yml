@@ -33,6 +33,25 @@ jobs:
           submodules: recursive
           persist-credentials: false
 
+      # The drivers and kits arrive as three submodules, because the configuration
+      # check runs "git -C <module.path> rev-parse HEAD" and requires the revision
+      # pinned in components.toml. Files copied into the device repository have no
+      # .git of their own, so that check would read the device repository HEAD.
+      #
+      # The three do not share one layout, so link each component into the flat
+      # drivers/ and kits/ directories the driver expects. Symlinks keep git
+      # scoping: git -C follows the link and finds the submodule .git above it.
+      - name: Link submodule components into drivers and kits
+        working-directory: device
+        run: |
+          set -eu
+          mkdir -p drivers kits
+          for d in modules/Pagani/drivers/*; do ln -sfn "../../$d" "drivers/$(basename "$d")"; done
+          for d in modules/Pagani/kits/*; do ln -sfn "../../$d" "kits/$(basename "$d")"; done
+          ln -sfn "../../modules/Sm8750Platform/kits/Sm8750Platform" kits/Sm8750Platform
+          ln -sfn "../../modules/QcomGeniSpi" drivers/QcomGeniSpi
+          ls -1 drivers kits
+
       - name: Read the maintained main fork pin
         id: main
         run: |

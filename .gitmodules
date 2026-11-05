@@ -1,3 +1,9 @@
 [submodule "modules/Pagani"]
 	path = modules/Pagani
-	url = https://github.com/IssacL04/UniXNU-Pagani-Drivers.git
+	url = https://github.com/xiaoan919/UniXNU-Pagani-Drivers.git
+[submodule "modules/QcomGeniSpi"]
+	path = modules/QcomGeniSpi
+	url = https://github.com/UniXNU/QcomGeniSpi.git
+[submodule "modules/Sm8750Platform"]
+	path = modules/Sm8750Platform
+	url = https://github.com/IssacL04/UniXNU-sm8750-common.git
