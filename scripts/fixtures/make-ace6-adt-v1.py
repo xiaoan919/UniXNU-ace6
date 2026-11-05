@@ -67,7 +67,7 @@ def make_tree(memory_size, random_seed, root_match_volume_uuid=None, trust_cache
         root_matching = [('root-matching', xml.encode())]
     return node('device-tree', [('model', b'iPad7,1\0' if ipad_identity else b'OnePlus Ace 6\0'),
                                *([('target-type', b'J120\0')] if ipad_identity else []),
-                               ('compatible', b'oneplus,pkx110\0qcom,sm8750\0')], [
+                               ('compatible', b'oneplus,plq110\0qcom,sm8750\0qcom,sun\0')], [
         node('chosen', [('random-seed', random_seed), *empty_nvram_proxy(), *root_matching,
                         ('osenvironment', b'main\0'),
                         *([('unique-chip-id', struct.pack('<Q', unique_chip_id)),
