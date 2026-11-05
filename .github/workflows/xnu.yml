@@ -45,6 +45,41 @@ jobs:
         working-directory: device
         run: |
           set -eu
+          # The drivers/ and kits/ links live inside device/, so a target must be
+          # relative to device/drivers/NAME, where one ../ reaches device/.
+          # Writing ../../modules/... instead escapes to the repository root and
+          # every link dangles.
+          mkdir -p drivers kits
+          for d in modules/Pagani/drivers/*; do
+            [ -d "$d" ] || continue
+            ln -sfn "../$d" "drivers/$(basename "$d")"
+          done
+          for d in modules/Pagani/kits/*; do
+            [ -d "$d" ] || continue
+            ln -sfn "../$d" "kits/$(basename "$d")"
+          done
+          ln -sfn "../modules/Sm8750Platform/kits/Sm8750Platform" kits/Sm8750Platform
+          ln -sfn "../modules/QcomGeniSpi" drivers/QcomGeniSpi
+          echo "--- drivers ---"
+          ls -1 drivers
+          echo "--- kits ---"
+          ls -1 kits
+          echo "--- resolve check ---"
+          for n in BootProgress PaganiInput NativeUfs QcomGeniSpi; do
+            test -e "drivers/$n" || { echo "dangling: drivers/$n"; exit 1; }
+            echo "ok drivers/$n -> $(readlink "drivers/$n")"
+          done
+          for n in NativePrelink PaganiVerifiedRoot Sm8750Platform; do
+            test -e "kits/$n" || { echo "dangling: kits/$n"; exit 1; }
+            echo "ok kits/$n -> $(readlink "kits/$n")"
+          done
+          test -f drivers/BootProgress/BootProgress.c
+          echo "BootProgress.c reachable through the link"
+
+      - name: Link submodule components into drivers and kits
+        working-directory: device
+        run: |
+          set -eu
           mkdir -p drivers kits
           for d in modules/Pagani/drivers/*; do ln -sfn "../../$d" "drivers/$(basename "$d")"; done
           for d in modules/Pagani/kits/*; do ln -sfn "../../$d" "kits/$(basename "$d")"; done
